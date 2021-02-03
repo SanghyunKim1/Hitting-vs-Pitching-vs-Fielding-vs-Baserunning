@@ -8,8 +8,8 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
+from statsmodels.tsa.seasonal import seasonal_decompose
 from math import sqrt
-from statsmodels.stats.outliers_influence import variance_inflation_factor
 import statsmodels.api as sm
 import missingno as msno
 import warnings
@@ -142,8 +142,11 @@ plt.text(0.5, 0.02, 'Year', ha='center', va='center')
 plt.text(0.06, 0.5, 'Scale', ha='center', va='center', rotation='vertical')
 plt.show()
 
-print(team_df.describe().to_string())
-print(scaled_df.describe().to_string())
+
+# create year bins
+scaled_df['Year Band'] = pd.cut(scaled_df['Season'], 15)
+print(scaled_df['Year Band'].head())
+
 
 
 # # correlation matrix
