@@ -11,6 +11,7 @@ from sklearn.impute import IterativeImputer
 from math import sqrt
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 import statsmodels.api as sm
+import missingno as msno
 import warnings
 warnings.filterwarnings('ignore')
 from matplotlib.axes._axes import _log as matplotlib_axes_logger
@@ -56,6 +57,14 @@ print(team_df[obj_cols].head())
 print('------- Missing Values -------')
 print(team_df.isnull().sum())
 
+# missing data visualization
+msno.matrix(team_df)
+msno.bar(team_df)
+msno.heatmap(team_df)
+
+# drop variables that is not worth imputing
+team_df.drop(['EV', 'oppEV'], axis=1, inplace=True)
+
 # replace missing values with predicted values using a linear regression model
 no_obj = team_df.select_dtypes(exclude='object')
 imputer = IterativeImputer(random_state=1).fit_transform(no_obj)
@@ -70,7 +79,7 @@ print(team_df.isnull().sum())
 print('Number of Duplicates: {}'.format(team_df.duplicated().sum()))
 
 # note: based on domain knowledge, I filtered the best features for this analysis
-# for more information, please refer to README.md on GitHub
+# for more information about how and why I selected features below, please refer to README.md on GitHub
 # drop unnecessary variables
 vars_keep = ['Season', 'Team', 'wPCT', 'wRC+', 'wOBA', 'WHIP', 'xFIP', 'Def', 'BsR']
 team_df = team_df[vars_keep]
@@ -86,38 +95,73 @@ team_df['Season'] = team_df['Season'].astype('int')
 
 # descriptive summaries
 print(team_df.describe().to_string())
+# as all the independent variables have different ranges, scale them
 
-# correlation matrix
-corrMatrix = team_df.corr()
-print(corrMatrix.to_string())
+# feature scaling
+no_scale = ['Season', 'Team', 'wPCT']
+scale = team_df.drop(no_scale, axis=1)
+cols = list(scale.columns)
 
-mask = np.triu(np.ones_like(corrMatrix, dtype=bool))
+scaler = StandardScaler()
+scaled_data = scaler.fit_transform(scale)
+scaled_df = pd.DataFrame(scaled_data, columns=cols)
 
-fig, ax = plt.subplots(figsize=(10, 10))
+team_df = pd.concat([team_df[no_scale], scaled_df], axis=1)
 
-sns.heatmap(corrMatrix, mask=mask, annot=True, annot_kws={'size':10}, square=True, linewidths=.5,
-            cbar_kws={'shrink': .5}, xticklabels=corrMatrix.columns, yticklabels=corrMatrix.columns, ax=ax)
-ax.set_title('Correlation Matrix')
+# KDE plot
+fig, ax = plt.subplots(figsize=(8, 8))
 
+for col in cols:
+    sns.kdeplot(team_df[col], ax=ax, label=col)
+    ax.set_title('After StandardScaler')
+    ax.set_xlabel('Data Scale')
+    plt.legend(loc=1)
+plt.show()
+
+# time series plot
+ind_vars = ['wRC+', 'wOBA', 'WHIP', 'xFIP', 'Def', 'BsR']
+season_df = team_df.groupby('Season')[ind_vars].median()
+
+fig, axes = plt.subplots(3, 2, figsize=(18, 10))
+palette = plt.get_cmap('Set1')
+num = 0
+
+for col, ax in zip(season_df, axes.flatten()[:7]):
+    num += 1
+    for var in season_df:
+        ax.plot(season_df[var], marker='', color='grey', linewidth=.6, alpha=.3)
+
+    ax.plot(season_df[col], marker='', color=palette(num), linewidth=2.4, alpha=.9,
+             label=col)
+
+    ax.set_title(col, loc='center', fontsize=12, fontweight=0)
+    ax.set_xticks(range(1870, 2020, 10))
+
+plt.suptitle('Changes in Each Statistic through The MLB History',
+             fontsize=15, fontweight=1, y=0.95)
+plt.text(0.5, 0.02, 'Year', ha='center', va='center')
+plt.text(0.06, 0.5, 'Scale', ha='center', va='center', rotation='vertical')
 plt.show()
 
 
 
 
-
-# # feature scaling
-# data = team_df[['wPCT', 'wRC+', 'wOBA', 'WHIP', 'xFIP', 'Def', 'BsR']]
-# scale = data.iloc[:, data.columns != 'wPCT']
-# cols = list(scale.columns)
+# # correlation matrix
+# corrMatrix = team_df.corr()
+# print(corrMatrix.to_string())
 #
-# scaler = StandardScaler()
-# scaled_data = scaler.fit_transform(scale)
-# scaled_df = pd.DataFrame(scaled_data, columns=cols)
+# mask = np.triu(np.ones_like(corrMatrix, dtype=bool))
 #
-# data = pd.concat([data['wPCT'], scaled_df], axis=1)
+# fig, ax = plt.subplots(figsize=(10, 10))
 #
-# x = data.iloc[:, data.columns != 'wPCT']
-# y = data['wPCT']
+# sns.heatmap(corrMatrix, mask=mask, annot=True, annot_kws={'size':10}, square=True, linewidths=.5,
+#             cbar_kws={'shrink': .5}, xticklabels=corrMatrix.columns, yticklabels=corrMatrix.columns, ax=ax)
+# ax.set_title('Correlation Matrix')
+#
+# plt.show()
+#
+# x = team_df.drop(['Season', 'Team', 'wPCT'], axis=1)
+# y = team_df['wPCT']
 #
 # x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=1)
 #
@@ -129,9 +173,9 @@ plt.show()
 # print(sqrt(metrics.mean_squared_error(y_test, y_predict)))
 # print(metrics.r2_score(y_test, y_predict))
 #
-# x = data.iloc[:, data.columns != 'wPCT']
+# x = team_df.drop(['Season', 'Team', 'wPCT'], axis=1)
 # x = sm.add_constant(x)
-# y = data['wPCT']
+# y = team_df['wPCT']
 #
 # lm = sm.OLS(y, x)
 # result = lm.fit()
@@ -143,8 +187,8 @@ plt.show()
 # vif['VIF'] = [variance_inflation_factor(lm.exog, i) for i in range(lm.exog.shape[1])]
 # print(vif[vif['Feature'] != 'const'].sort_values('VIF', ascending=False))
 #
-# x = data.iloc[:, data.columns != 'wPCT']
-# y = data['wPCT']
+# x = team_df.drop(['Season', 'Team', 'wPCT'], axis=1)
+# y = team_df['wPCT']
 #
 # model = LinearRegression()
 # cv_r2 = cross_val_score(model, x, y, scoring='r2', cv=10)
