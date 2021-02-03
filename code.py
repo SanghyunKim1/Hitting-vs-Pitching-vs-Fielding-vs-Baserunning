@@ -59,7 +59,6 @@ print(team_df.isnull().sum())
 
 # missing data visualization
 msno.matrix(team_df)
-msno.bar(team_df)
 msno.heatmap(team_df)
 
 # drop variables that is not worth imputing
@@ -106,13 +105,13 @@ scaler = StandardScaler()
 scaled_data = scaler.fit_transform(scale)
 scaled_df = pd.DataFrame(scaled_data, columns=cols)
 
-team_df = pd.concat([team_df[no_scale], scaled_df], axis=1)
+scaled_df = pd.concat([team_df[no_scale], scaled_df], axis=1)
 
 # KDE plot
 fig, ax = plt.subplots(figsize=(8, 8))
 
 for col in cols:
-    sns.kdeplot(team_df[col], ax=ax, label=col)
+    sns.kdeplot(scaled_df[col], ax=ax, label=col)
     ax.set_title('After StandardScaler')
     ax.set_xlabel('Data Scale')
     plt.legend(loc=1)
@@ -120,7 +119,7 @@ plt.show()
 
 # time series plot
 ind_vars = ['wRC+', 'wOBA', 'WHIP', 'xFIP', 'Def', 'BsR']
-season_df = team_df.groupby('Season')[ind_vars].median()
+season_df = scaled_df.groupby('Season')[ind_vars].median()
 
 fig, axes = plt.subplots(3, 2, figsize=(18, 10))
 palette = plt.get_cmap('Set1')
@@ -143,7 +142,8 @@ plt.text(0.5, 0.02, 'Year', ha='center', va='center')
 plt.text(0.06, 0.5, 'Scale', ha='center', va='center', rotation='vertical')
 plt.show()
 
-
+print(team_df.describe().to_string())
+print(scaled_df.describe().to_string())
 
 
 # # correlation matrix
