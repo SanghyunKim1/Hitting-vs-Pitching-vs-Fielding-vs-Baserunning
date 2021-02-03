@@ -142,10 +142,17 @@ plt.text(0.5, 0.02, 'Year', ha='center', va='center')
 plt.text(0.06, 0.5, 'Scale', ha='center', va='center', rotation='vertical')
 plt.show()
 
-
 # create year bins
-scaled_df['Year Band'] = pd.cut(scaled_df['Season'], 15)
-print(scaled_df['Year Band'].head())
+bins = [1870, 1900, 1920, 1940, 1960, 1980, 2000, 2020]
+labels = ['1871-1899', '1900-1919', '1920-1939', '1940-1959',
+          '1960-1979', '1980-1999', '2000-2019']
+
+team_df['Year Band'] = pd.cut(team_df['Season'], bins, labels=labels,
+                                include_lowest=True, right=False)
+
+generation = team_df.groupby('Year Band')
+result = generation[ind_vars].mean()
+print(result.to_string())
 
 
 
