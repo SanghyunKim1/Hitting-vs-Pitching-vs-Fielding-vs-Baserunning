@@ -149,6 +149,8 @@ labels = ['1871-1899', '1900-1919', '1920-1939', '1940-1959',
 
 team_df['Year Band'] = pd.cut(team_df['Season'], bins, labels=labels,
                                 include_lowest=True, right=False)
+scaled_df['Year Band'] = pd.cut(scaled_df['Season'], bins, labels=labels,
+                                include_lowest=True, right=False)
 
 
 # changes in each statistic measured by 'mean' and 'median' through the periods
@@ -158,17 +160,18 @@ print(result.to_string())
 
 # compare teams whose 'wPCT' is higher than 0.500 with teams whose 'wPCT' is less than 0.500
 # note: scaled data is used for this analysis to accurately compare all the different stats
-winning_team = scaled_df.loc[scaled_df['wPCT'] >= 0.500]
-winning_team_stat = winning_team[ind_vars].agg(['mean', 'median'])
+scaled_df['wPCT > 0.500'] = np.where(scaled_df['wPCT'] >= 0.500, '> 0.500', '< 0.500')
 
-losing_team = scaled_df.loc[scaled_df['wPCT'] < 0.500]
-losing_team_stat = losing_team[ind_vars].agg(['mean', 'median'])
+five_hundered = scaled_df.groupby('wPCT > 0.500')
+team_stat = five_hundered[ind_vars].agg(['mean', 'median'])
 
 print('------- Winning Team Stats -------')
-print(winning_team_stat)
+print(team_stat.to_string())
 
-print('------- Losing Team Stats -------')
-print(losing_team_stat)
+
+
+# offense analysis
+
 
 # # correlation matrix
 # corrMatrix = team_df.corr()
