@@ -82,7 +82,7 @@ print('Number of Duplicates: {}'.format(team_df.duplicated().sum()))
 # note: based on domain knowledge, I filtered the best features for this analysis
 # for more information about how and why I selected features below, please refer to README.md on GitHub
 # drop unnecessary variables
-vars_keep = ['Season', 'Team', 'wPCT', 'wRC+', 'wOBA', 'WHIP', 'xFIP', 'Def', 'BsR']
+vars_keep = ['Season', 'Team', 'wPCT', 'wRC+', 'wOBA', 'WHIP', 'Def', 'BsR']
 team_df = team_df[vars_keep]
 
 
@@ -95,7 +95,7 @@ print('Data Structure: {}'.format(team_df.shape))
 team_df['Season'] = team_df['Season'].astype('int')
 
 # normality
-# wPCT normality
+# 'wPCT' normality
 fig, axes = plt.subplots(1, 2, figsize=(20, 8))
 
 sns.histplot(team_df['wPCT'], kde=True, ax=axes[0])
@@ -103,6 +103,25 @@ axes[0].set_title('Team Winning Percentage Histogram')
 
 stats.probplot(team_df['wPCT'], plot=axes[1])
 axes[1].set_title('Team Winning Percentage Q-Q Plot')
+
+plt.show()
+
+# independent variables normality
+ind_vars = ['wRC+', 'wOBA', 'WHIP', 'Def', 'BsR']
+
+fig, axes = plt.subplots(3, 2, figsize=(15, 15))
+
+for col, ax in zip(ind_vars, axes.flatten()[:7]):
+    sns.histplot(team_df[col], kde=True, color='navy', ax=ax)
+    ax.set_title('Team {} Histogram'.format(col))
+
+plt.show()
+
+fig, axes = plt.subplots(3, 2, figsize=(15, 15))
+
+for col, ax in zip(ind_vars, axes.flatten()[:7]):
+    stats.probplot(team_df[col], plot=ax)
+    ax.set_title('Team {} Q-Q Plot'.format(col))
 
 plt.show()
 
@@ -132,7 +151,6 @@ for col in cols:
 plt.show()
 
 # time series plot
-ind_vars = ['wRC+', 'wOBA', 'WHIP', 'xFIP', 'Def', 'BsR']
 season_df = scaled_df.groupby('Season')[ind_vars].median()
 
 fig, axes = plt.subplots(3, 2, figsize=(18, 10))
@@ -171,7 +189,7 @@ print(era_stats.to_string())
 
 # visualize changes in each statistic through different eras
 scaled_era_df = scaled_df.groupby('Era')
-scaled_era_stats = scaled_era_df[ind_vars].mean()
+scaled_era_stats = scaled_era_df[ind_vars].median()
 
 fig, axes = plt.subplots(3, 2, figsize=(18, 10))
 palette = plt.get_cmap('Set1')
@@ -197,54 +215,58 @@ AVGteam_stat = wPCT_grouped[ind_vars].mean().reset_index()
 print(AVGteam_stat)
 
 
-# # correlation matrix
-# corrMatrix = team_df.corr()
-# print(corrMatrix.to_string())
-#
-# mask = np.triu(np.ones_like(corrMatrix, dtype=bool))
-#
-# fig, ax = plt.subplots(figsize=(10, 10))
-#
-# sns.heatmap(corrMatrix, mask=mask, annot=True, annot_kws={'size':10}, square=True, linewidths=.5,
-#             cbar_kws={'shrink': .5}, xticklabels=corrMatrix.columns, yticklabels=corrMatrix.columns, ax=ax)
-# ax.set_title('Correlation Matrix')
-#
-# plt.show()
-#
-# x = team_df.drop(['Season', 'Team', 'wPCT', 'Era'], axis=1)
-# y = team_df['wPCT']
-#
-# x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=1)
-#
-# lm = linear_model.LinearRegression().fit(x_train, y_train)
-# y_predict = lm.predict(x_test)
-#
-# print(lm.intercept_)
-# print(lm.coef_)
-# print(sqrt(metrics.mean_squared_error(y_test, y_predict)))
-# print(metrics.r2_score(y_test, y_predict))
-#
-# x = team_df.drop(['Season', 'Team', 'wPCT', 'Era'], axis=1)
-# x = sm.add_constant(x)
-# y = team_df['wPCT']
-#
-# lm = sm.OLS(y, x)
-# result = lm.fit()
-#
-# print(result.summary())
-#
-# vif = pd.DataFrame()
-# vif['Feature'] = lm.exog_names
-# vif['VIF'] = [variance_inflation_factor(lm.exog, i) for i in range(lm.exog.shape[1])]
-# print(vif[vif['Feature'] != 'const'].sort_values('VIF', ascending=False))
-#
-# x = team_df.drop(['Season', 'Team', 'wPCT'], axis=1)
-# y = team_df['wPCT']
-#
-# model = LinearRegression()
-# cv_r2 = cross_val_score(model, x, y, scoring='r2', cv=10)
-# cv_mse = cross_val_score(model, x, y, scoring='neg_mean_squared_error', cv=10)
-# cv_rmse = np.sqrt(-1 * cv_mse)
-#
-# print(cv_r2.mean())
-# print(cv_rmse.mean())
+
+
+
+# correlation matrix
+corrMatrix = team_df.corr()
+print(corrMatrix.to_string())
+
+mask = np.triu(np.ones_like(corrMatrix, dtype=bool))
+
+fig, ax = plt.subplots(figsize=(10, 10))
+
+sns.heatmap(corrMatrix, mask=mask, annot=True, annot_kws={'size':10}, square=True, linewidths=.5,
+            cbar_kws={'shrink': .5}, xticklabels=corrMatrix.columns, yticklabels=corrMatrix.columns, ax=ax)
+ax.set_title('Correlation Matrix')
+
+plt.show()
+
+# linear regression
+x = scaled_df.drop(['Season', 'Team', 'wPCT', 'Era', 'wPCT > 0.500'], axis=1)
+y = scaled_df['wPCT']
+
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=1)
+
+lm = linear_model.LinearRegression().fit(x_train, y_train)
+y_predict = lm.predict(x_test)
+
+print(lm.intercept_)
+print(lm.coef_)
+print(sqrt(metrics.mean_squared_error(y_test, y_predict)))
+print(metrics.r2_score(y_test, y_predict))
+
+x = scaled_df.drop(['Season', 'Team', 'wPCT', 'Era', 'wPCT > 0.500'], axis=1)
+x = sm.add_constant(x)
+y = scaled_df['wPCT']
+
+lm = sm.OLS(y, x)
+result = lm.fit()
+
+print(result.summary())
+
+vif = pd.DataFrame()
+vif['Feature'] = lm.exog_names
+vif['VIF'] = [variance_inflation_factor(lm.exog, i) for i in range(lm.exog.shape[1])]
+print(vif[vif['Feature'] != 'const'].sort_values('VIF', ascending=False))
+
+x = scaled_df.drop(['Season', 'Team', 'wPCT', 'Era', 'wPCT > 0.500'], axis=1)
+y = scaled_df['wPCT']
+
+model = LinearRegression()
+cv_r2 = cross_val_score(model, x, y, scoring='r2', cv=10)
+cv_mse = cross_val_score(model, x, y, scoring='neg_mean_squared_error', cv=10)
+cv_rmse = np.sqrt(-1 * cv_mse)
+
+print(cv_r2.mean())
+print(cv_rmse.mean())
