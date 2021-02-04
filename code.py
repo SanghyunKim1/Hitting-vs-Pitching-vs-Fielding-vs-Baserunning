@@ -150,11 +150,25 @@ labels = ['1871-1899', '1900-1919', '1920-1939', '1940-1959',
 team_df['Year Band'] = pd.cut(team_df['Season'], bins, labels=labels,
                                 include_lowest=True, right=False)
 
-generation = team_df.groupby('Year Band')
-result = generation[ind_vars].mean()
+
+# changes in each statistic measured by 'mean' and 'median' through the periods
+generation = team_df.groupby('Year Band', as_index=False)
+result = generation[ind_vars].agg(['mean', 'median'])
 print(result.to_string())
 
+# compare teams whose 'wPCT' is higher than 0.500 with teams whose 'wPCT' is less than 0.500
+# note: scaled data is used for this analysis to accurately compare all the different stats
+winning_team = scaled_df.loc[scaled_df['wPCT'] >= 0.500]
+winning_team_stat = winning_team[ind_vars].agg(['mean', 'median'])
 
+losing_team = scaled_df.loc[scaled_df['wPCT'] < 0.500]
+losing_team_stat = losing_team[ind_vars].agg(['mean', 'median'])
+
+print('------- Winning Team Stats -------')
+print(winning_team_stat)
+
+print('------- Losing Team Stats -------')
+print(losing_team_stat)
 
 # # correlation matrix
 # corrMatrix = team_df.corr()
