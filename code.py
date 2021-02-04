@@ -8,8 +8,10 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
+from statsmodels.stats.outliers_influence import variance_inflation_factor
 from statsmodels.tsa.seasonal import seasonal_decompose
 from math import sqrt
+from scipy import stats
 import statsmodels.api as sm
 import missingno as msno
 import warnings
@@ -92,6 +94,18 @@ print('Data Structure: {}'.format(team_df.shape))
 # change data types
 team_df['Season'] = team_df['Season'].astype('int')
 
+# normality
+# wPCT normality
+fig, axes = plt.subplots(1, 2, figsize=(20, 8))
+
+sns.histplot(team_df['wPCT'], kde=True, ax=axes[0])
+axes[0].set_title('Team Winning Percentage Histogram')
+
+stats.probplot(team_df['wPCT'], plot=axes[1])
+axes[1].set_title('Team Winning Percentage Q-Q Plot')
+
+plt.show()
+
 # descriptive summaries
 print(team_df.describe().to_string())
 # as all the independent variables have different ranges, scale them
@@ -138,8 +152,6 @@ for col, ax in zip(season_df, axes.flatten()[:7]):
 
 plt.suptitle('Changes in Each Statistic through The MLB History',
              fontsize=15, fontweight=1, y=0.95)
-plt.text(0.5, 0.02, 'Year', ha='center', va='center')
-plt.text(0.06, 0.5, 'Scale', ha='center', va='center', rotation='vertical')
 plt.show()
 
 # create year bins
@@ -147,30 +159,42 @@ bins = [1870, 1900, 1920, 1940, 1960, 1980, 2000, 2020]
 labels = ['1871-1899', '1900-1919', '1920-1939', '1940-1959',
           '1960-1979', '1980-1999', '2000-2019']
 
-team_df['Year Band'] = pd.cut(team_df['Season'], bins, labels=labels,
-                                include_lowest=True, right=False)
-scaled_df['Year Band'] = pd.cut(scaled_df['Season'], bins, labels=labels,
-                                include_lowest=True, right=False)
+team_df['Era'] = pd.cut(team_df['Season'], bins, labels=labels,
+                        include_lowest=True, right=False)
+scaled_df['Era'] = pd.cut(scaled_df['Season'], bins, labels=labels,
+                          include_lowest=True, right=False)
 
+# changes in 'mean' and 'median' statistics measured in each era
+era_df = team_df.groupby('Era', as_index=False)
+era_stats = era_df[ind_vars].agg(['mean', 'median'])
+print(era_stats.to_string())
 
-# changes in each statistic measured by 'mean' and 'median' through the periods
-generation = team_df.groupby('Year Band', as_index=False)
-result = generation[ind_vars].agg(['mean', 'median'])
-print(result.to_string())
+# visualize changes in each statistic through different eras
+scaled_era_df = scaled_df.groupby('Era')
+scaled_era_stats = scaled_era_df[ind_vars].mean()
+
+fig, axes = plt.subplots(3, 2, figsize=(18, 10))
+palette = plt.get_cmap('Set1')
+num = 0
+
+for col, ax in zip(ind_vars, axes.flatten()[:7]):
+    num += 1
+    for var in scaled_era_stats:
+        ax.plot(scaled_era_stats[var], marker='', color='grey', linewidth=.6, alpha=.3)
+
+    ax.plot(scaled_era_stats[col], marker='', color=palette(num), linewidth=2.4, alpha=.9)
+    ax.set_title(col, loc='center', fontsize=12, fontweight=0)
+
+plt.suptitle('Changes in Each Statistic through Different Eras')
+plt.show()
 
 # compare teams whose 'wPCT' is higher than 0.500 with teams whose 'wPCT' is less than 0.500
 # note: scaled data is used for this analysis to accurately compare all the different stats
 scaled_df['wPCT > 0.500'] = np.where(scaled_df['wPCT'] >= 0.500, '> 0.500', '< 0.500')
 
-five_hundered = scaled_df.groupby('wPCT > 0.500')
-team_stat = five_hundered[ind_vars].agg(['mean', 'median'])
-
-print('------- Winning Team Stats -------')
-print(team_stat.to_string())
-
-
-
-# offense analysis
+wPCT_grouped = scaled_df.groupby('wPCT > 0.500')
+AVGteam_stat = wPCT_grouped[ind_vars].mean().reset_index()
+print(AVGteam_stat)
 
 
 # # correlation matrix
@@ -187,7 +211,7 @@ print(team_stat.to_string())
 #
 # plt.show()
 #
-# x = team_df.drop(['Season', 'Team', 'wPCT'], axis=1)
+# x = team_df.drop(['Season', 'Team', 'wPCT', 'Era'], axis=1)
 # y = team_df['wPCT']
 #
 # x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=1)
@@ -200,7 +224,7 @@ print(team_stat.to_string())
 # print(sqrt(metrics.mean_squared_error(y_test, y_predict)))
 # print(metrics.r2_score(y_test, y_predict))
 #
-# x = team_df.drop(['Season', 'Team', 'wPCT'], axis=1)
+# x = team_df.drop(['Season', 'Team', 'wPCT', 'Era'], axis=1)
 # x = sm.add_constant(x)
 # y = team_df['wPCT']
 #
