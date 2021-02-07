@@ -3,8 +3,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.preprocessing import StandardScaler
-from sklearn import linear_model, metrics
-from sklearn.linear_model import LinearRegression
+from sklearn import metrics
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
@@ -82,7 +82,7 @@ print('Number of Duplicates: {}'.format(team_df.duplicated().sum()))
 # note: based on domain knowledge, I filtered the best features for this analysis
 # for more information about how and why I selected features below, please refer to README.md on GitHub
 # drop unnecessary variables
-vars_keep = ['Season', 'Team', 'wPCT', 'wRC+', 'wOBA', 'WHIP', 'Def', 'BsR']
+vars_keep = ['Season', 'Team', 'wPCT', 'wRC+', 'wOBA', 'WHIP', 'xFIP', 'Def', 'BsR']
 team_df = team_df[vars_keep]
 
 
@@ -107,7 +107,7 @@ axes[1].set_title('Team Winning Percentage Q-Q Plot')
 plt.show()
 
 # independent variables normality
-ind_vars = ['wRC+', 'wOBA', 'WHIP', 'Def', 'BsR']
+ind_vars = ['wRC+', 'wOBA', 'WHIP', 'xFIP', 'Def', 'BsR']
 
 fig, axes = plt.subplots(3, 2, figsize=(15, 15))
 
@@ -216,8 +216,6 @@ print(AVGteam_stat)
 
 
 
-
-
 # correlation matrix
 corrMatrix = team_df.corr()
 print(corrMatrix.to_string())
@@ -232,41 +230,92 @@ ax.set_title('Correlation Matrix')
 
 plt.show()
 
-# linear regression
+# scatter plots
+fig, axes = plt.subplots(3, 2, figsize=(15, 15))
+
+for col, ax in zip(ind_vars, axes.flatten()[:7]):
+    sns.regplot(col, 'wPCT', data=scaled_df, scatter_kws={'color':'black'},
+                line_kws={'color':'red'}, ax=ax)
+    ax.set_title('Correlation between Team {} and Winning Percentage'.format(col))
+
+plt.show()
+
+
+
+
+# find the best number of estimators for random forest regression
 x = scaled_df.drop(['Season', 'Team', 'wPCT', 'Era', 'wPCT > 0.500'], axis=1)
 y = scaled_df['wPCT']
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=1)
 
-lm = linear_model.LinearRegression().fit(x_train, y_train)
-y_predict = lm.predict(x_test)
+model = RandomForestRegressor(n_jobs=-1, random_state=0)
 
-print(lm.intercept_)
-print(lm.coef_)
-print(sqrt(metrics.mean_squared_error(y_test, y_predict)))
-print(metrics.r2_score(y_test, y_predict))
+n_estimators = np.arange(10, 200, 10)
+scores = []
 
-x = scaled_df.drop(['Season', 'Team', 'wPCT', 'Era', 'wPCT > 0.500'], axis=1)
-x = sm.add_constant(x)
-y = scaled_df['wPCT']
+for n in n_estimators:
+    model.set_params(n_estimators=n)
+    model.fit(x_train, y_train)
+    scores.append([n, model.score(x_test, y_test)])
 
-lm = sm.OLS(y, x)
-result = lm.fit()
+scores_df = pd.DataFrame(scores, columns={'n Estimators', 'Score'})
 
-print(result.summary())
+fig, ax = plt.subplots()
 
-vif = pd.DataFrame()
-vif['Feature'] = lm.exog_names
-vif['VIF'] = [variance_inflation_factor(lm.exog, i) for i in range(lm.exog.shape[1])]
-print(vif[vif['Feature'] != 'const'].sort_values('VIF', ascending=False))
+sns.lineplot(x='n Estimators', y='Score', data=scores_df, color='red', ax=ax)
+ax.set_title('Changes in Scores given The Number of Estimators')
+ax.set_xlabel('Number of Estimators')
+ax.set_ylabel('Score')
 
-x = scaled_df.drop(['Season', 'Team', 'wPCT', 'Era', 'wPCT > 0.500'], axis=1)
-y = scaled_df['wPCT']
+plt.show()
 
-model = LinearRegression()
-cv_r2 = cross_val_score(model, x, y, scoring='r2', cv=10)
-cv_mse = cross_val_score(model, x, y, scoring='neg_mean_squared_error', cv=10)
-cv_rmse = np.sqrt(-1 * cv_mse)
+best_Nestimators = scores_df[scores_df['Score'] == scores_df['Score'].max()]
+print('------- Best Number of Estimators -------')
+print(best_Nestimators)
 
-print(cv_r2.mean())
-print(cv_rmse.mean())
+# random forest regression
+model = RandomForestRegressor(n_estimators=90, n_jobs=-1, random_state=0)
+model.fit(x_train, y_train)
+score = model.scores(x_test, y_test)
+
+
+
+# # linear regression
+# x = scaled_df.drop(['Season', 'Team', 'wPCT', 'Era', 'wPCT > 0.500'], axis=1)
+# y = scaled_df['wPCT']
+#
+# x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=1)
+#
+# lm = linear_model.LinearRegression().fit(x_train, y_train)
+# y_predict = lm.predict(x_test)
+#
+# print(lm.intercept_)
+# print(lm.coef_)
+# print(sqrt(metrics.mean_squared_error(y_test, y_predict)))
+# print(metrics.r2_score(y_test, y_predict))
+#
+# x = scaled_df.drop(['Season', 'Team', 'wPCT', 'Era', 'wPCT > 0.500'], axis=1)
+# x = sm.add_constant(x)
+# y = scaled_df['wPCT']
+#
+# lm = sm.OLS(y, x)
+# result = lm.fit()
+#
+# print(result.summary())
+#
+# vif = pd.DataFrame()
+# vif['Feature'] = lm.exog_names
+# vif['VIF'] = [variance_inflation_factor(lm.exog, i) for i in range(lm.exog.shape[1])]
+# print(vif[vif['Feature'] != 'const'].sort_values('VIF', ascending=False))
+#
+# x = scaled_df.drop(['Season', 'Team', 'wPCT', 'Era', 'wPCT > 0.500'], axis=1)
+# y = scaled_df['wPCT']
+#
+# model = LinearRegression()
+# cv_r2 = cross_val_score(model, x, y, scoring='r2', cv=10)
+# cv_mse = cross_val_score(model, x, y, scoring='neg_mean_squared_error', cv=10)
+# cv_rmse = np.sqrt(-1 * cv_mse)
+#
+# print(cv_r2.mean())
+# print(cv_rmse.mean())
