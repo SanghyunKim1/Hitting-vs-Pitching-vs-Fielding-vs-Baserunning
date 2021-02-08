@@ -5,14 +5,12 @@ import seaborn as sns
 from sklearn.preprocessing import StandardScaler
 from sklearn import metrics
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.inspection import permutation_importance
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
-from statsmodels.stats.outliers_influence import variance_inflation_factor
-from statsmodels.tsa.seasonal import seasonal_decompose
 from math import sqrt
 from scipy import stats
-import statsmodels.api as sm
 import missingno as msno
 import warnings
 warnings.filterwarnings('ignore')
@@ -183,9 +181,9 @@ scaled_df['Era'] = pd.cut(scaled_df['Season'], bins, labels=labels,
                           include_lowest=True, right=False)
 
 # changes in 'mean' and 'median' statistics measured in each era
-era_df = team_df.groupby('Era', as_index=False)
-era_stats = era_df[ind_vars].agg(['mean', 'median'])
-print(era_stats.to_string())
+era_grouped = team_df.groupby('Era', as_index=False)
+era_grouped_stats = era_grouped[ind_vars].agg(['mean', 'median'])
+print(era_grouped_stats.to_string())
 
 # visualize changes in each statistic through different eras
 scaled_era_df = scaled_df.groupby('Era')
@@ -211,20 +209,56 @@ plt.show()
 scaled_df['wPCT > 0.500'] = np.where(scaled_df['wPCT'] >= 0.500, '> 0.500', '< 0.500')
 
 wPCT_grouped = scaled_df.groupby('wPCT > 0.500')
-AVGteam_stat = wPCT_grouped[ind_vars].mean().reset_index()
-print(AVGteam_stat)
+wPCT_grouped_stats = wPCT_grouped[ind_vars].median().reset_index()
+print(wPCT_grouped_stats)
 
+# grouped bar plot
+barWidth = 0.15
+wRC_plus = wPCT_grouped['wRC+'].median()
+wOBA = wPCT_grouped['wOBA'].median()
+WHIP = wPCT_grouped['WHIP'].median()
+xFIP = wPCT_grouped['xFIP'].median()
+Def = wPCT_grouped['Def'].median()
+BsR = wPCT_grouped['BsR'].median()
+
+category = [wRC_plus, wOBA, WHIP, xFIP, Def, BsR]
+
+r1 = np.arange(len(wRC_plus))
+r2 = [x + barWidth for x in r1]
+r3 = [x + barWidth for x in r2]
+r4 = [x + barWidth for x in r3]
+r5 = [x + barWidth for x in r4]
+r6 = [x + barWidth for x in r5]
+
+rs = [r1, r2, r3, r4, r5, r6]
+
+category_color = plt.get_cmap('Pastel1')
+num = 0
+
+for var, r, col in zip(category, rs, ind_vars):
+    num += 1
+    plt.bar(r, var, color=category_color(num), width=barWidth, edgecolor='white', label=col)
+
+plt.title('Stat Comparison based on Team Winning Percentage')
+plt.xlabel('wPCT', fontweight='bold')
+plt.xticks([r + barWidth for r in range(len(wRC_plus))], ['Lower than 0.500', 'Higher than 0.500'],
+           ha='left')
+plt.ylabel('Scale', fontweight='bold')
+plt.legend()
+
+plt.show()
 
 
 # correlation matrix
 corrMatrix = team_df.corr()
+print('------- Correlation -------')
 print(corrMatrix.to_string())
 
 mask = np.triu(np.ones_like(corrMatrix, dtype=bool))
 
 fig, ax = plt.subplots(figsize=(10, 10))
 
-sns.heatmap(corrMatrix, mask=mask, annot=True, annot_kws={'size':10}, square=True, linewidths=.5,
+sns.heatmap(corrMatrix, mask=mask, annot=True, annot_kws={'size':10}, square=True, cmap='plasma', linewidths=.5,
             cbar_kws={'shrink': .5}, xticklabels=corrMatrix.columns, yticklabels=corrMatrix.columns, ax=ax)
 ax.set_title('Correlation Matrix')
 
@@ -242,7 +276,7 @@ plt.show()
 
 
 
-
+### 3. Random Forest Regression ###
 # find the best number of estimators for random forest regression
 x = scaled_df.drop(['Season', 'Team', 'wPCT', 'Era', 'wPCT > 0.500'], axis=1)
 y = scaled_df['wPCT']
@@ -252,6 +286,7 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_
 model = RandomForestRegressor(n_jobs=-1, random_state=0)
 
 n_estimators = np.arange(10, 200, 10)
+
 scores = []
 
 for n in n_estimators:
@@ -259,63 +294,46 @@ for n in n_estimators:
     model.fit(x_train, y_train)
     scores.append([n, model.score(x_test, y_test)])
 
-scores_df = pd.DataFrame(scores, columns={'n Estimators', 'Score'})
+scores_df = pd.DataFrame(scores, columns=['n Estimators', 'Score'])
+print(scores_df)
 
 fig, ax = plt.subplots()
 
-sns.lineplot(x='n Estimators', y='Score', data=scores_df, color='red', ax=ax)
+sns.lineplot('n Estimators', 'Score', data=scores_df, color='red', ax=ax)
 ax.set_title('Changes in Scores given The Number of Estimators')
 ax.set_xlabel('Number of Estimators')
 ax.set_ylabel('Score')
 
 plt.show()
 
-best_Nestimators = scores_df[scores_df['Score'] == scores_df['Score'].max()]
+Nbest_estimators = scores_df[scores_df['Score'] == scores_df['Score'].max()]
 print('------- Best Number of Estimators -------')
-print(best_Nestimators)
+print(Nbest_estimators)
 
 # random forest regression
 model = RandomForestRegressor(n_estimators=90, n_jobs=-1, random_state=0)
 model.fit(x_train, y_train)
-score = model.scores(x_test, y_test)
+y_predict = model.predict(x_test)
+
+score = model.score(x_test, y_test)
+mse = metrics.mean_squared_error(y_test, y_predict)
+
+print('------- Random Forest Result -------')
+print('R-squared: {}'.format(score))
+print('RMSE: {}'.format(sqrt(mse)))
 
 
 
-# # linear regression
-# x = scaled_df.drop(['Season', 'Team', 'wPCT', 'Era', 'wPCT > 0.500'], axis=1)
-# y = scaled_df['wPCT']
-#
-# x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=1)
-#
-# lm = linear_model.LinearRegression().fit(x_train, y_train)
-# y_predict = lm.predict(x_test)
-#
-# print(lm.intercept_)
-# print(lm.coef_)
-# print(sqrt(metrics.mean_squared_error(y_test, y_predict)))
-# print(metrics.r2_score(y_test, y_predict))
-#
-# x = scaled_df.drop(['Season', 'Team', 'wPCT', 'Era', 'wPCT > 0.500'], axis=1)
-# x = sm.add_constant(x)
-# y = scaled_df['wPCT']
-#
-# lm = sm.OLS(y, x)
-# result = lm.fit()
-#
-# print(result.summary())
-#
-# vif = pd.DataFrame()
-# vif['Feature'] = lm.exog_names
-# vif['VIF'] = [variance_inflation_factor(lm.exog, i) for i in range(lm.exog.shape[1])]
-# print(vif[vif['Feature'] != 'const'].sort_values('VIF', ascending=False))
-#
-# x = scaled_df.drop(['Season', 'Team', 'wPCT', 'Era', 'wPCT > 0.500'], axis=1)
-# y = scaled_df['wPCT']
-#
-# model = LinearRegression()
-# cv_r2 = cross_val_score(model, x, y, scoring='r2', cv=10)
-# cv_mse = cross_val_score(model, x, y, scoring='neg_mean_squared_error', cv=10)
-# cv_rmse = np.sqrt(-1 * cv_mse)
-#
-# print(cv_r2.mean())
-# print(cv_rmse.mean())
+### 4. permutation importance ###
+r = permutation_importance(model, x_test, y_test, random_state=0)
+sorted_idx = r.importances_mean.argsort()
+
+plt.barh(x_test.columns[sorted_idx], r.importances_mean[sorted_idx])
+plt.title('Permutation Importance')
+plt.xlabel('Importance')
+
+plt.show()
+
+print('------- Permutation Importance -------')
+for i in sorted_idx[::-1]:
+    print('{} Importance: {}'.format(x_test.columns[i], round(r.importances_mean[i], 3)))
