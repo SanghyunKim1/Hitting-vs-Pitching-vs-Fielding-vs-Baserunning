@@ -283,10 +283,9 @@ y = scaled_df['wPCT']
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=1)
 
-model = RandomForestRegressor(n_jobs=-1, random_state=0)
+model = RandomForestRegressor(n_jobs=-1, random_state=1)
 
 n_estimators = np.arange(10, 200, 10)
-
 scores = []
 
 for n in n_estimators:
@@ -325,11 +324,11 @@ print('RMSE: {}'.format(sqrt(mse)))
 
 
 ### 4. permutation importance ###
-r = permutation_importance(model, x_test, y_test, random_state=0)
+r = permutation_importance(model, x_test, y_test, n_repeats=30, random_state=0)
 sorted_idx = r.importances_mean.argsort()
 
 plt.barh(x_test.columns[sorted_idx], r.importances_mean[sorted_idx])
-plt.title('Permutation Importance')
+plt.title('Permutation Importance (1871-2019)')
 plt.xlabel('Importance')
 
 plt.show()
@@ -337,3 +336,55 @@ plt.show()
 print('------- Permutation Importance -------')
 for i in sorted_idx[::-1]:
     print('{} Importance: {}'.format(x_test.columns[i], round(r.importances_mean[i], 3)))
+
+### 5. Cross-era Comparison ###
+def random_forest(era):
+    data = scaled_df[scaled_df['Era'] == era]
+    x = data.drop(['Season', 'Team', 'wPCT', 'Era', 'wPCT > 0.500'], axis=1)
+    y = data['wPCT']
+
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=0)
+    model = RandomForestRegressor(n_jobs=-1, random_state=1)
+    model.fit(x_train, y_train)
+
+    n_estimators = list(range(10, 200, 10))
+    scores = []
+    
+    for n in n_estimators:
+        model.set_params(n_estimators=n)
+        model.fit(x_train, y_train)
+        scores.append([n, model.score(x_test, y_test)])
+
+    scores_df = pd.DataFrame(scores, columns=['n Estimators', 'Score'])
+    Nbest_estimators = scores_df.loc[scores_df['Score'] == scores_df['Score'].max(), 'n Estimators'].item()
+
+    model = RandomForestRegressor(n_estimators=Nbest_estimators, n_jobs=-1, random_state=0)
+    model.fit(x_train, y_train)
+    y_predict = model.predict(x_test)
+
+    score = model.score(x_test, y_test)
+    mse = metrics.mean_squared_error(y_test, y_predict)
+
+    print('------- Random Forest Regression ({}) -------'.format(era))
+    print('R-squared: {}'.format(score))
+    print('RMSE: {}'.format(sqrt(mse)))
+
+    # permutation importance cross-era comparison
+    r = permutation_importance(model, x_test, y_test, n_repeats=30, random_state=0)
+    sorted_idx = r.importances_mean.argsort()
+
+    plt.barh(x_test.columns[sorted_idx], r.importances_mean[sorted_idx])
+    plt.title('Permutation Importance ({})'.format(era))
+    plt.xlabel('Importance')
+
+    plt.show()
+
+
+random_forest('1871-1899')
+random_forest('1900-1919')
+random_forest('1920-1939')
+random_forest('1940-1959')
+random_forest('1960-1979')
+random_forest('1980-1999')
+random_forest('2000-2019')
+
