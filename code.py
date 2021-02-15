@@ -80,7 +80,7 @@ print('Number of Duplicates: {}'.format(team_df.duplicated().sum()))
 # note: based on domain knowledge, I filtered the best features for this analysis
 # for more information about how and why I selected features below, please refer to README.md on GitHub
 # drop unnecessary variables
-vars_keep = ['Season', 'Team', 'wPCT', 'wRC+', 'wOBA', 'WHIP', 'xFIP', 'Def', 'BsR']
+vars_keep = ['Season', 'Team', 'wPCT', 'wRC+', 'wOBA', 'WHIP', 'pWAR', 'Def', 'BsR']
 team_df = team_df[vars_keep]
 
 
@@ -105,7 +105,7 @@ axes[1].set_title('Team Winning Percentage Q-Q Plot')
 plt.show()
 
 # independent variables normality
-ind_vars = ['wRC+', 'wOBA', 'WHIP', 'xFIP', 'Def', 'BsR']
+ind_vars = ['wRC+', 'wOBA', 'WHIP', 'pWAR', 'Def', 'BsR']
 
 fig, axes = plt.subplots(3, 2, figsize=(15, 15))
 
@@ -217,11 +217,11 @@ barWidth = 0.15
 wRC_plus = wPCT_grouped['wRC+'].median()
 wOBA = wPCT_grouped['wOBA'].median()
 WHIP = wPCT_grouped['WHIP'].median()
-xFIP = wPCT_grouped['xFIP'].median()
+FIP = wPCT_grouped['pWAR'].median()
 Def = wPCT_grouped['Def'].median()
 BsR = wPCT_grouped['BsR'].median()
 
-category = [wRC_plus, wOBA, WHIP, xFIP, Def, BsR]
+category = [wRC_plus, wOBA, WHIP, FIP, Def, BsR]
 
 r1 = np.arange(len(wRC_plus))
 r2 = [x + barWidth for x in r1]
@@ -309,8 +309,10 @@ Nbest_estimators = scores_df[scores_df['Score'] == scores_df['Score'].max()]
 print('------- Best Number of Estimators -------')
 print(Nbest_estimators)
 
+Nbest_estimators = scores_df.loc[scores_df['Score'] == scores_df['Score'].max(), 'n Estimators'].item()
+
 # random forest regression
-model = RandomForestRegressor(n_estimators=40, n_jobs=-1, random_state=0)
+model = RandomForestRegressor(n_estimators=Nbest_estimators, n_jobs=-1, random_state=0)
 model.fit(x_train, y_train)
 y_predict = model.predict(x_test)
 
@@ -320,6 +322,14 @@ mse = metrics.mean_squared_error(y_test, y_predict)
 print('------- Random Forest Result -------')
 print('R-squared: {}'.format(score))
 print('RMSE: {}'.format(sqrt(mse)))
+
+# random forest feature importance
+importance = model.feature_importances_
+sorted_idx = np.argsort(importance)[::-1]
+
+print('------- Random Forest Feature Importance (1871-2019) -------')
+for i in sorted_idx:
+    print('{} Imoportance: {}'.format(x.columns[i], round(importance[i], 3)))
 
 
 
@@ -370,6 +380,14 @@ def random_forest(era):
     print('------- Random Forest Regression ({}) -------'.format(era))
     print('R-squared: {}'.format(score))
     print('RMSE: {}'.format(sqrt(mse)))
+
+    # random forest feature importance cross-era comparison
+    importance = model.feature_importances_
+    sorted_indices = np.argsort(importance)[::-1]
+
+    print('------- Random Forest Feature Importance ({}) -------'.format(era))
+    for i in sorted_indices:
+        print('{} Importance: {}'.format(x.columns[i], round(importance[i], 3)))
 
     # permutation importance cross-era comparison
     r = permutation_importance(model, x_test, y_test, n_repeats=30, random_state=0)
