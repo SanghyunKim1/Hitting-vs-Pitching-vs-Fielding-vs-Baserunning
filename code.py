@@ -328,19 +328,19 @@ for i in sorted_idx:
 
 
 
-### 4. permutation importance ###
-r = permutation_importance(model, x_test, y_test, n_repeats=30, random_state=0)
-sorted_idx = r.importances_mean.argsort()
-
-plt.barh(x_test.columns[sorted_idx], r.importances_mean[sorted_idx])
-plt.title('Permutation Importance (1871-2019)')
-plt.xlabel('Importance')
-
-plt.show()
-
-print('------- Permutation Importance -------')
-for i in sorted_idx[::-1]:
-    print('{} Importance: {}'.format(x_test.columns[i], round(r.importances_mean[i], 3)))
+# ### 4. permutation importance ###
+# r = permutation_importance(model, x_test, y_test, n_repeats=30, random_state=0)
+# sorted_idx = r.importances_mean.argsort()
+#
+# plt.barh(x_test.columns[sorted_idx], r.importances_mean[sorted_idx])
+# plt.title('Permutation Importance (1871-2019)')
+# plt.xlabel('Importance')
+#
+# plt.show()
+#
+# print('------- Permutation Importance -------')
+# for i in sorted_idx[::-1]:
+#     print('{} Importance: {}'.format(x_test.columns[i], round(r.importances_mean[i], 3)))
 
 
 
@@ -455,18 +455,18 @@ for era in eras:
     for i in sorted_indices:
         print('{} Importance: {}'.format(x.columns[i], round(importance[i], 3)))
 
-    # permutation importance cross-era comparison
-    r = permutation_importance(model, x_test, y_test, n_repeats=30, random_state=0)
-    sorted_idx = r.importances_mean.argsort()
-
-    print('------- Permutation Importance ({})-------'.format(era))
-    for i in sorted_idx[::-1]:
-        print('{} Importance: {}'.format(x_test.columns[i], round(r.importances_mean[i], 3)))
-
-    plt.barh(x_test.columns[sorted_idx], r.importances_mean[sorted_idx])
-    plt.title('Permutation Importance ({})'.format(era))
-    plt.xlabel('Importance')
-    plt.show()
+    # # permutation importance cross-era comparison
+    # r = permutation_importance(model, x_test, y_test, n_repeats=30, random_state=0)
+    # sorted_idx = r.importances_mean.argsort()
+    #
+    # print('------- Permutation Importance ({})-------'.format(era))
+    # for i in sorted_idx[::-1]:
+    #     print('{} Importance: {}'.format(x_test.columns[i], round(r.importances_mean[i], 3)))
+    #
+    # plt.barh(x_test.columns[sorted_idx], r.importances_mean[sorted_idx])
+    # plt.title('Permutation Importance ({})'.format(era))
+    # plt.xlabel('Importance')
+    # plt.show()
 
 
 
@@ -500,7 +500,6 @@ def importance_score(results, category_names):
                     color=text_color, fontsize='small')
     ax.set_title('Changes in Impacts of Stats on Team Winning Percentage',
                  fontweight='bold')
-    ax.set_xlabel('Percentage Contribution (%)', loc='center', fontweight='bold')
     ax.set_ylabel('Era', fontweight='bold')
     ax.legend(ncol=len(category_names), bbox_to_anchor=(0, -0.1),
               loc='lower left', fontsize='medium')
@@ -519,11 +518,23 @@ def linear_model(era):
     x = sm.add_constant(x)
     y = data['wPCT']
 
-    lm = sm.OLS(y, x)
-    result = lm.fit()
+    lm = sm.OLS(y, x).fit()
 
     print('------- Linear Regression Result ({}) -------'.format(era))
-    print(result.summary())
+    print(lm.summary())
+
+    # residual plot
+    fitted_y = lm.fittedvalues
+
+    fig, ax = plt.subplots(figsize=(8, 6))
+
+    sns.residplot(fitted_y, 'wPCT', data=data, lowess=True, scatter_kws={'alpha': 0.5},
+                          line_kws={'color': 'red', 'lw': 1, 'alpha': 0.8}, ax=ax)
+    ax.set_title('Residuals vs Fitted Values ({})'.format(era))
+    ax.set_xlabel('Fitted Values')
+    ax.set_ylabel("Residuals")
+
+    plt.show()
 
 linear_model('1871-1899')
 linear_model('1900-1919')
