@@ -51,10 +51,6 @@ team_df['wPCT'] = round((team_df['W']/team_df['G']), 3)
 # check data types
 print(team_df.dtypes)
 
-# categorical variables
-obj_cols = list(team_df.select_dtypes(include='object'))
-print(team_df[obj_cols].head())
-
 # number of missing values
 print('------- Missing Data -------')
 print(team_df.isnull().sum())
