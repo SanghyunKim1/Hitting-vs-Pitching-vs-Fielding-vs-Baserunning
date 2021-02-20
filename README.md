@@ -74,7 +74,6 @@ Players' pure skills can further be broke down into four different aspects: **Hi
 | ***RA9-WAR*** | [Runs Allowed based WAR](https://library.fangraphs.com/pitching/fdp/) |
 | ***WAR*** | [Wins Above Replacement for Pitchers](https://library.fangraphs.com/war/calculating-war-pitchers/) |
 
-
 ### 3. Data Cleaning
 - Renamed data features for clarity.
   * *Batting Dataset*: **R** to **RS**
@@ -89,4 +88,7 @@ Players' pure skills can further be broke down into four different aspects: **Hi
   * **G**: *# Games Played* = **W** + **L**
   * **wPCT**: *Team Winning Percentage* = (**W** + **L**)/**G**
 - Checked missing data and replaced them **xFIP** projected values based on linear regression result (**IterativeImputer**).
-- Dropped unncessary columns
+- Dropped unncessary columns.
+
+### 4. EDA (Exploratory Data Analysis)
+
