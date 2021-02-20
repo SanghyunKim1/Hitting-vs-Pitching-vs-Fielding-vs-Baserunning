@@ -22,8 +22,8 @@ matplotlib_axes_logger.setLevel('ERROR')
 # purpose of project: among 4 factors of baseball (hitting, pitching, defense, and baserunning) find the most accurate importance of each factor in terms of making 1 win
 
 # load datasets
-batting_df = pd.read_csv('/Users/sanghyunkim/Desktop/Data Science Project/MLB Analysis/Offense-Pitching-Fielding-and-Baserunning/data/FanGraphs Team Batting Data.csv')
-pitching_df = pd.read_csv('/Users/sanghyunkim/Desktop/Data Science Project/MLB Analysis/Offense-Pitching-Fielding-and-Baserunning/data/FanGraphs Team Pitching Data.csv')
+batting_df = pd.read_csv('/Users/sanghyunkim/Desktop/Data Science Project/MLB Analysis/Hitting-vs-Pitching-vs-Fielding-vs-Baserunning/data/FanGraphs Team Batting Data.csv')
+pitching_df = pd.read_csv('/Users/sanghyunkim/Desktop/Data Science Project/MLB Analysis/Hitting-vs-Pitching-vs-Fielding-vs-Baserunning/data/FanGraphs Team Pitching Data.csv')
 
 
 ### 1. Data Cleaning ###
