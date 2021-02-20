@@ -6,7 +6,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn import metrics
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.inspection import permutation_importance
-from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.model_selection import train_test_split
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
 import statsmodels.api as sm
@@ -18,7 +18,8 @@ warnings.filterwarnings('ignore')
 from matplotlib.axes._axes import _log as matplotlib_axes_logger
 matplotlib_axes_logger.setLevel('ERROR')
 
-# purpose of project: among 4 factors of baseball (offense, pitching, defense, and baserunning) find the most accurate importance of each factor in terms of making 1 win
+
+# purpose of project: among 4 factors of baseball (hitting, pitching, defense, and baserunning) find the most accurate importance of each factor in terms of making 1 win
 
 # load datasets
 batting_df = pd.read_csv('/Users/sanghyunkim/Desktop/Data Science Project/MLB Analysis/Offense-Pitching-Fielding-and-Baserunning/data/FanGraphs Team Batting Data.csv')
@@ -55,12 +56,17 @@ obj_cols = list(team_df.select_dtypes(include='object'))
 print(team_df[obj_cols].head())
 
 # number of missing values
-print('------- Missing Values -------')
+print('------- Missing Data -------')
 print(team_df.isnull().sum())
 
 # missing data visualization
 msno.matrix(team_df)
-msno.heatmap(team_df)
+
+missing_df = pd.DataFrame(index=list(team_df.columns))
+missing_df['% Missing Data'] = (team_df.isnull().sum() / len(team_df))
+missing_df['% Missing Data'] = missing_df['% Missing Data'].map(lambda x: "{0:.2f}%".format(x*100))
+missing_vars = missing_df.loc[missing_df['% Missing Data'] != '0.00%']
+print(missing_vars.sort_values('% Missing Data', ascending=False))
 
 # drop variables that is not worth imputing
 team_df.drop(['EV', 'oppEV'], axis=1, inplace=True)
@@ -72,7 +78,7 @@ impute_df = pd.DataFrame(data=imputer, columns=no_obj.columns)
 
 team_df = pd.concat([team_df['Team'], impute_df], axis=1)
 
-print('------- Missing Values -------')
+print('------- Missing Data -------')
 print(team_df.isnull().sum())
 
 # number of duplicates
@@ -149,7 +155,8 @@ for col in cols:
 
 plt.show()
 
-# time series plot
+# Changes in median values of each stat throughout the MLB history
+# note: scaled data is used for this analysis to accurately compare all the different stats
 season_df = scaled_df.groupby('Season')[ind_vars].median()
 
 fig, axes = plt.subplots(2, 2, figsize=(18, 7))
@@ -167,7 +174,7 @@ for col, ax in zip(season_df, axes.flatten()[:7]):
     ax.set_title(col, loc='center', fontsize=12, fontweight=0)
     ax.set_xticks(range(1870, 2020, 10))
 
-plt.suptitle('Changes in Each Statistic through The MLB History',
+plt.suptitle('Changes in Median Values of Each Stat throughout The MLB History',
              fontsize=15, fontweight=1, y=0.95)
 plt.show()
 
@@ -181,12 +188,12 @@ for df in data:
     df['Era'] = pd.cut(df['Season'], bins, labels=labels,
                        include_lowest=True, right=False)
 
-# changes in 'mean' and 'median' statistics measured in each era
+# changes in 'mean' and 'median' stats in different eras
 era_grouped = team_df.groupby('Era', as_index=False)
 era_grouped_stats = era_grouped[ind_vars].agg(['mean', 'median'])
 print(era_grouped_stats.to_string())
 
-# visualize changes in each stat through different eras
+# Changes in median values of each stat throughout different eras
 scaled_era_df = scaled_df.groupby('Era')
 scaled_era_stats = scaled_era_df[ind_vars].median()
 
@@ -206,7 +213,6 @@ plt.suptitle('Changes in Each Median Stat through Different Eras')
 plt.show()
 
 # compare teams whose 'wPCT' is higher than 0.500 with teams whose 'wPCT' is less than 0.500
-# note: scaled data is used for this analysis to accurately compare all the different stats
 scaled_df['wPCT > 0.500'] = np.where(scaled_df['wPCT'] >= 0.500, '> 0.500', '< 0.500')
 
 wPCT_grouped = scaled_df.groupby('wPCT > 0.500')
@@ -238,8 +244,7 @@ for var, r, col in zip(category, rs, ind_vars):
 
 plt.title('Stat Comparison based on Team Winning Percentage')
 plt.xlabel('wPCT', fontweight='bold')
-plt.xticks([r + barWidth for r in range(len(wOBA))], ['Lower than 0.500', 'Higher than 0.500'],
-           ha='left')
+plt.xticks([r + barWidth for r in range(len(wOBA))], ['Lower than 0.500', 'Higher than 0.500'])
 plt.ylabel('Scale', fontweight='bold')
 plt.legend(loc='lower right')
 
@@ -328,90 +333,8 @@ for i in sorted_idx:
 
 
 
-# ### 4. permutation importance ###
-# r = permutation_importance(model, x_test, y_test, n_repeats=30, random_state=0)
-# sorted_idx = r.importances_mean.argsort()
-#
-# plt.barh(x_test.columns[sorted_idx], r.importances_mean[sorted_idx])
-# plt.title('Permutation Importance (1871-2019)')
-# plt.xlabel('Importance')
-#
-# plt.show()
-#
-# print('------- Permutation Importance -------')
-# for i in sorted_idx[::-1]:
-#     print('{} Importance: {}'.format(x_test.columns[i], round(r.importances_mean[i], 3)))
-
-
-
-# ### 5. Cross-era Comparison ###
-# def random_forest(era):
-#     data = team_df[team_df['Era'] == era]
-#     x = data.drop(['Season', 'Team', 'wPCT', 'Era'], axis=1)
-#     y = data['wPCT']
-#
-#     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=0)
-#     model = RandomForestRegressor(n_jobs=-1, random_state=1)
-#     model.fit(x_train, y_train)
-#
-#     n_estimators = list(range(10, 200, 10))
-#     scores = []
-#
-#     for n in n_estimators:
-#         model.set_params(n_estimators=n)
-#         model.fit(x_train, y_train)
-#         scores.append([n, model.score(x_test, y_test)])
-#
-#     scores_df = pd.DataFrame(scores, columns=['n Estimators', 'Score'])
-#     Nbest_estimators = scores_df.loc[scores_df['Score'] == scores_df['Score'].max(), 'n Estimators'].item()
-#
-#     model = RandomForestRegressor(n_estimators=Nbest_estimators, n_jobs=-1, random_state=0)
-#     model.fit(x_train, y_train)
-#     y_predict = model.predict(x_test)
-#
-#     score = model.score(x_test, y_test)
-#     mse = metrics.mean_squared_error(y_test, y_predict)
-#
-#     print('------- Random Forest Regression ({}) -------'.format(era))
-#     print('R-squared: {}'.format(score))
-#     print('RMSE: {}'.format(sqrt(mse)))
-#
-#
-#     # random forest feature importance cross-era comparison
-#     importance = model.feature_importances_
-#     sorted_indices = np.argsort(importance)[::-1]
-#
-#     print('------- Random Forest Feature Importance ({}) -------'.format(era))
-#     for i in sorted_indices:
-#         print('{} Importance: {}'.format(x.columns[i], round(importance[i], 3)))
-#
-#
-#     # permutation importance cross-era comparison
-#     r = permutation_importance(model, x_test, y_test, n_repeats=30, random_state=0)
-#     sorted_idx = r.importances_mean.argsort()
-#
-#     print('------- Permutation Importance ({})-------'.format(era))
-#     for i in sorted_idx[::-1]:
-#         print('{} Importance: {}'.format(x_test.columns[i], round(r.importances_mean[i], 3)))
-#
-#     plt.barh(x_test.columns[sorted_idx], r.importances_mean[sorted_idx])
-#     plt.title('Permutation Importance ({})'.format(era))
-#     plt.xlabel('Importance')
-#     plt.show()
-#
-#
-# random_forest('1871-1899')
-# random_forest('1900-1919')
-# random_forest('1920-1939')
-# random_forest('1940-1959')
-# random_forest('1960-1979')
-# random_forest('1980-1999')
-# random_forest('2000-2019')
-
-
-
 ### 5. Cross-era Comparison ###
-eras = list(team_df['Era'].unique())
+eras = sorted(list(team_df['Era'].unique()))
 importance_dict = {}
 
 for era in eras:
