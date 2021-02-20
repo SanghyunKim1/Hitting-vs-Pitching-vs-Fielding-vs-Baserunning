@@ -91,4 +91,24 @@ Players' pure skills can further be broke down into four different aspects: **Hi
 - Dropped unncessary columns.
 
 ### 4. EDA (Exploratory Data Analysis)
+***4-1. Normality***
+![](https://github.com/shk204105/Hitting-vs-Pitching-vs-Fielding-vs-Baserunning/blob/master/images/wPCT%20Histogram:Q-Q%20Plot.png)
 
+<table>
+<tr>
+<td><img src="https://github.com/shk204105/Hitting-vs-Pitching-vs-Fielding-vs-Baserunning/blob/master/images/Histograms.png" width=600 height=450></td>
+<td><img src="https://github.com/shk204105/Hitting-vs-Pitching-vs-Fielding-vs-Baserunning/blob/master/images/Q-Q%20Plots.png" width=600 height=450></td>
+</tr>
+</table> 
+
+According to the histograms and Q-Q plots above, although all the features seem to follow approximate noraml distributions, **wOBA** and **BsR** are slighty skewed. However, as I'm going to use a random forest regression model, normalizing data wouldn't be necessary.
+
+
+***4-2. Scaling***
+
+Scaling is also not needed for random forest models but as the purpose of this analysis is to compare the impacts of features that have significantly different ranges, I've scaled features using *StandardScaler*. The result is the following:
+
+<img src="https://github.com/shk204105/Hitting-vs-Pitching-vs-Fielding-vs-Baserunning/blob/master/images/KDE%20Plot.png" width=600 height=600>
+
+***4-3. Historical Changes in Each Stat***
+Since 1871, many external factors such as changes in rules and resilience of the ball, league expansion, or advances in skills have been affecting the way games are played (i.e. how teams win the ball game).
