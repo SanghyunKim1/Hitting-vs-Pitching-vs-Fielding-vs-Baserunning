@@ -73,3 +73,20 @@ Players' pure skills can further be broke down into four different aspects: **Hi
 | ***RAR*** | Runs Above Replacement for Pitchers |
 | ***RA9-WAR*** | [Runs Allowed based WAR](https://library.fangraphs.com/pitching/fdp/) |
 | ***WAR*** | [Wins Above Replacement for Pitchers](https://library.fangraphs.com/war/calculating-war-pitchers/) |
+
+
+### 3. Data Cleaning
+- Renamed data features for clarity.
+  * *Batting Dataset*: **R** to **RS**
+  * *Batting Dataset*: **WAR** to **bWAR**
+  * *Pitching Dataset*: **R** to **RA**
+  * *Pitching Dataset*: **BABIP** to **oppBABIP**
+  * *Pitching Dataset*: **EV** to **oppEV**
+  * *Pitching Dataset*: **WAR** to **pWAR**
+- Combined team batting and team pitching dataset.
+- Created new data features.
+  * **UER**: *Unearned Runs* = **RA** - **ER**
+  * **G**: *# Games Played* = **W** + **L**
+  * **wPCT**: *Team Winning Percentage* = (**W** + **L**)/**G**
+- Checked missing data and replaced them **xFIP** projected values based on linear regression result (**IterativeImputer**).
+- Dropped unncessary columns
