@@ -305,9 +305,8 @@ Nbest_estimators = scores_df[scores_df['Score'] == scores_df['Score'].max()]
 print('------- Best Number of Estimators -------')
 print(Nbest_estimators)
 
-Nbest_estimators = scores_df.loc[scores_df['Score'] == scores_df['Score'].max(), 'n Estimators'].item()
-
 # random forest regression
+Nbest_estimators = scores_df.loc[scores_df['Score'] == scores_df['Score'].max(), 'n Estimators'].item()
 model = RandomForestRegressor(n_estimators=Nbest_estimators, n_jobs=-1, random_state=0)
 model.fit(x_train, y_train)
 y_predict = model.predict(x_test)
