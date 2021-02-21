@@ -86,7 +86,7 @@ Players' pure skills can further be broke down into four different aspects: **Hi
   * **UER**: *Unearned Runs* = **RA** - **ER**
   * **G**: *# Games Played* = **W** + **L**
   * **wPCT**: *Team Winning Percentage* = (**W** + **L**)/**G**
-- Checked missing data and replaced them **xFIP** projected values based on linear regression result (**IterativeImputer**).
+- Checked missing data and replaced **xFIP** projected values based on linear regression result (**IterativeImputer**).
 - Dropped unncessary columns.
 
 ### 4. Feature Selection (Domain Knowledge)
@@ -189,3 +189,13 @@ With the same data, the result of random forest models in each era is:
 | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | :-----------: | 
 | ***R-squared*** | 0.573 | 0.780 | 0.710 | 0.816 | 0.743 | 0.673 | 0.714 |
 | ***RMSE*** | 0.099 | 0.047 | 0.051 | 0.040 | 0.038 | 0.039 | 0.040 |
+
+According to the result, the random forest models seem to yield a better result in each era with higher R-squared values got higher and lower RMSEs (except the early days of MLB).
+
+![](https://github.com/shk204105/Hitting-vs-Pitching-vs-Fielding-vs-Baserunning/blob/master/images/Feature%20Importance.png)
+
+To effectively see how feature importance varied from era to era, I combined all the results in each era and visualized discrete distributions in a horizontal bar chart. According to the bar chart above, there is a clear trend in feature importance from era to era.
+
+In the early days (1871 ~ 1899), **fielding** had the most significant impacts on a team's winnig percentage (about 60.2%), while **hitting**, **pitching** and **baserunning** had marginal influences. However, it appears that such a result has been reversed as time goes on. The importance of **fielding** has declined throughout the history, whereas the importance of **hitting** and **pitching** has increased recently. In the 2000s, **hitting** and **pitching** have the majority part of a team's winning percentage (about 80% together), while **fielding** and **baserunning** don't.
+
+Furthermore, there's one more clear pattern here. **Baserunning** has never been as important as hitting, pitching, and fielding since the start of MLB. In other words, teams have never benefitted that much from successful base running since 1871, so why do they want to focus on base running?
