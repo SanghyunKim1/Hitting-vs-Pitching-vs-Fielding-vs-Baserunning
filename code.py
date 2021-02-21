@@ -193,7 +193,7 @@ print(era_grouped_stats.to_string())
 scaled_era_df = scaled_df.groupby('Era')
 scaled_era_stats = scaled_era_df[ind_vars].median()
 
-fig, axes = plt.subplots(2, 2, figsize=(15, 6))
+fig, axes = plt.subplots(2, 2, figsize=(18, 7))
 palette = plt.get_cmap('Set1')
 num = 0
 
