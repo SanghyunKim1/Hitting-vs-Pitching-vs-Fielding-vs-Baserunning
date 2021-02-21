@@ -388,13 +388,11 @@ for era in eras:
     # plt.show()
 
     # K-fold cross validation
-    cv_r2 = cross_val_score(model, x, y, scoring='r2', cv=10)
     cv_mse = cross_val_score(model, x, y, scoring='neg_mean_squared_error', cv=10)
     cv_rmse = np.sqrt(-1 * cv_mse)
 
     print('------- 10-Fold Cross Validation ({}) -------'.format(era))
-    print('Mean R-squared: {}'.format(cv_r2.mean()))
-    print('Mean RMSE: {}'.format(cv_rmse).mean())
+    print('Mean RMSE: {}'.format(cv_rmse.mean()))
 
 
 ### 6. Feature Importance Visualization ###
