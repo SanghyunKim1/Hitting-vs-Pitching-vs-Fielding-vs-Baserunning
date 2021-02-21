@@ -151,3 +151,8 @@ Another way to get some ideas about feature importance would be comparing how th
 The bar plot above where each bar represents the median scales of stats depicts that there's a notable difference in stats between these two groups. Teams of which winning percentage is above 0.500 records higher team *wOBA*, *Def* and *BsR* with lower *FIP* than teams with winning percentage below 0.500. However, it's not the only thing this bar plot shows.
 
 See how large the differences in each stat between these two groups are. While the differences in *wOBA* and *Def* are relatively larger, the difference in *FIP* is not as significant as *wOBA* and *Def*. Moreoever, the difference in *BsR* between these two groups are marginal compared to other three stats. Thus, **hitting** and **fielding** might have more significant impacts on a team's winning percentage than **pitching**, while **baserunning** is not that important. Let's see if that's the case.
+
+### 6. Random Forest Regression
+
+![](https://github.com/shk204105/Hitting-vs-Pitching-vs-Fielding-vs-Baserunning/blob/master/images/Estimators.png)
+
