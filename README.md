@@ -104,7 +104,7 @@ One of the most common problem is that conventional stats have is they treat dif
 - **Fielding**: Fielding is a relatively more recent research area where sabermetricians still try to find better stats. The criteria to find a single fielding measurement is: (i)it should be an overall stat that properly represents a team's fielding ability, and (ii) it should be avaiable for old teams like 1870s teams. Based on these two criteria, I used **Def** devised by *FanGraphs*.
 **Def** is the sum of *fielding runs above average* and *positional adjustment*. The *fielding runs above avarage* here is measured by *UZR (Ultimate Zone Rating)* which measures a fielder's run values compared to the probability that an average MLB fielder would successfully convert balls into outs at nine different positions. For more information about Def, see [here](https://library.fangraphs.com/defense/def/).
 
-- **Baserunning**: Unlike other aspects of player skills, baserunning is an area where there are not many stats available. Some sabermetricians measure a runner's sprint speed (in ft/sec), but such data are unavailable for the past day's teams and inappropriate to use for a team's base running ability. Therefore, I used **BsR** devised by *FanGraphs*. According to *FanGraphs*, **BsR** is an overall base running stat that turns *(i) weighted stolen bases*, *(ii) Weighted Grounded Into Double Play Runs*, and *(iii) Ultimate Base Running (UBR)* into runs above/below average. For more information about BsR, see [here](https://library.fangraphs.com/offense/bsr/).
+- **Baserunning**: Unlike other aspects of player skills, baserunning is an area where there are not many stats available. Some sabermetricians measure a runner's sprint speed (in ft/sec), but such data are unavailable for the past day's teams and inappropriate to use for a team's base running ability. Therefore, I used **BsR** devised by *FanGraphs*. According to *FanGraphs*, **BsR** is an overall base running stat that turns *(i) weighted stolen bases*, *(ii) weighted grounded into double play runs*, and *(iii) Ultimate Base Running (UBR)* into runs above/below average. For more information about BsR, see [here](https://library.fangraphs.com/offense/bsr/).
  
 
 ### 5. EDA (Exploratory Data Analysis)
@@ -123,10 +123,19 @@ According to the histograms and Q-Q plots above, although all the features seem 
 
 ***5-2. Scaling***
 
-Scaling is also not needed for random forest models but as the purpose of this analysis is to compare the impacts of features that have significantly different ranges, I've scaled features using *StandardScaler*. The result is the following:
-
 <img src="https://github.com/shk204105/Hitting-vs-Pitching-vs-Fielding-vs-Baserunning/blob/master/images/KDE%20Plot.png" width=600 height=600>
+
+Although scaling is also not needed for random forest models, I scaled features using *StandardScaler* to get some ideas about feature importance by directly comparing features.
+
 
 ***5-3. Historical Changes in Each Stat***
 
-Since 1871, many external factors (e.g. changes in rules and resilience of the ball, league expansion, or advances in skills) have been affecting the way games are played (i.e. how teams win the ball game). Thus, it's reasonable to assume that it can be proved by looking at how these stats changed through the MLB history. Also, it'd give us a 
+Since 1871, many external factors (e.g. changes in rules and resilience of the ball, league expansion, or advances in skills) have been affecting the way games are played (i.e. how teams win the ball game). Therefore, it's reasonable to think that such external factors must have affected league average stats throughout the MLB history. Further, looking at those historical changes in each stat would also give us some basic ideas about what was the most important factors in different eras. To see those changes I created two time series plots.
+
+*Note: I used median values of each stat instead of mean values to avoid outlier issues. Also, I used scaled data to accurately measure 
+
+![](https://github.com/shk204105/Hitting-vs-Pitching-vs-Fielding-vs-Baserunning/blob/master/images/Time%20Series%20Plot1.png)
+
+According to the line plot above, while *Def* and *BsR* seem to stay constant, *wOBA* and *FIP* that represent **Hitting** and **Pitching**, respectively are relatively more fluctuating depending on eras. What does it indicate?. Well, it could show that *the importance of **hitting** and **pitching** ability has been larger than **fielding** and **baserunning***.
+
+Another pattern we can see from this plot is that when league wOBA was relatively high (i.e. hitter-friendly eras), league FIP also got higher (i.e. pitchers must have struggled with doing their jobs during the same eras) on average, and *vice versa*.
