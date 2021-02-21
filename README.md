@@ -5,12 +5,11 @@
 3. Data Cleaning
 4. Feature Selection (Domain Knowledge)
 5. EDA (Exploratory Data Analysis)
-6. Feature Scaling
-7. Random Forest Regressoin
-8. Feature Importance
-9. Cross-era Comparison
-10. Multiple Linear Regression
-11. Conclusion
+6. Random Forest Regressoin
+7. Feature Importance
+8. Cross-era Comparison
+9. Multiple Linear Regression
+10. Conclusion
 
 ### 1. Intro
 Baseball is a complicated sport that consists of many different factors such as player skills, team chemistry, health, money, weather and so on (*even luck as well*). And these various factors can be broken down as follows: what we can measure and predict, and what we cannot. For example, we can easily measure skills and team payrolls, while it's relatively hard (may be impossible) to accurately measure weather and luck.
@@ -118,7 +117,7 @@ One of the most common problem is that conventional stats have is they treat dif
 </tr>
 </table> 
 
-According to the histograms and Q-Q plots above, although all the features seem to follow approximate noraml distributions, **wOBA** and **BsR** are slighty skewed. However, as I'm going to use a random forest regression model, normalizing data wouldn't be necessary.
+According to the histograms and Q-Q plots above, although all the features seem to follow approximate noraml distributions, **wOBA** and **BsR** are slighty skewed. However, as I'm going to use a random forest regression model, normalizing data is unnecessary.
 
 
 ***5-2. Scaling***
@@ -127,10 +126,9 @@ According to the histograms and Q-Q plots above, although all the features seem 
 
 Although scaling is also not needed for random forest models, I scaled features using *StandardScaler* to get some ideas about feature importance by directly comparing features.
 
-
 ***5-3. Historical Changes in Each Stat***
 
-Since 1871, many external factors (e.g. changes in rules and resilience of the ball, league expansion, or advances in skills) have been affecting the way games are played (i.e. how teams win the ball game). Therefore, it's reasonable to think that such external factors must have affected league average stats throughout the MLB history. Further, looking at those historical changes in each stat would also give us some basic ideas about what was the most important factors in different eras. To see those changes I created two time series plots.
+Since 1871, many external factors (e.g. changes in rules and resilience of the ball, league expansion, or advances in skills) have been affecting the way games are played (i.e. how teams win the ball game). Therefore, it's reasonable to think that such external factors must have affected league average stats throughout the MLB history. Further, looking at those historical changes in each stat would also give us some general ideas about what was the most important factors in different eras. To see those changes I created two time series plots.
 
 *Note: I used median values of each stat instead of mean values to avoid outlier issues. Also, I used scaled data to accurately measure 
 
@@ -138,4 +136,18 @@ Since 1871, many external factors (e.g. changes in rules and resilience of the b
 
 According to the line plot above, while *Def* and *BsR* seem to stay constant, *wOBA* and *FIP* that represent **Hitting** and **Pitching**, respectively are relatively more fluctuating depending on eras. What does it indicate?. Well, it could show that *the importance of **hitting** and **pitching** ability has been larger than **fielding** and **baserunning***.
 
-Another pattern we can see from this plot is that when league wOBA was relatively high (i.e. hitter-friendly eras), league FIP also got higher (i.e. pitchers must have struggled with doing their jobs during the same eras) on average, and *vice versa*.
+Another pattern we can see from this plot is that when league wOBA was relatively high (i.e. hitter-friendly eras), league FIP also got higher (i.e. pitchers must have struggled with doing their jobs during the same eras) on average, and *vice versa*. (Note: the lower FIP is the better pitchers do their jobs.)
+
+![](https://github.com/shk204105/Hitting-vs-Pitching-vs-Fielding-vs-Baserunning/blob/master/images/Time%20Series%20Plot2.png)
+
+I also created year bins to see a general trend for those stats, and the result seems similar to what I've concluded above.
+
+***5-4. Winning Team vs Losing Team***
+
+![](https://github.com/shk204105/Hitting-vs-Pitching-vs-Fielding-vs-Baserunning/blob/master/images/Bar%20Plot.png)
+
+Another way to get some ideas about feature importance would be comparing how those four stats differ on average based on team winning percentages. To do so, I created a binary feature which represents whether a team winning percentage is above 0.500 or below 0.500, and compared how the average values of stats differ depending on these two groups.
+
+The bar plot above where each bar represents the median scales of stats depicts that there's a notable difference in stats between these two groups. Teams of which winning percentage is above 0.500 records higher team *wOBA*, *Def* and *BsR* with lower *FIP* than teams with winning percentage below 0.500. However, it's not the only thing this bar plot shows.
+
+See how large the differences in each stat between these two groups are. While the differences in *wOBA* and *Def* are relatively larger, the difference in *FIP* is not as significant as *wOBA* and *Def*. Moreoever, the difference in *BsR* between these two groups are marginal compared to other three stats. Thus, **hitting** and **fielding** might have more significant impacts on a team's winning percentage than **pitching**, while **baserunning** is not that important. Let's see if that's the case.
