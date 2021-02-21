@@ -7,7 +7,7 @@
 5. EDA (Exploratory Data Analysis)
 6. Random Forest Regressoin with Feature Importance
 7. Cross-era Comparison
-8. Multiple Linear Regression
+8. Linear Regression
 9. Conclusion
 
 ### 1. Intro
@@ -199,3 +199,6 @@ To effectively see how feature importance varied from era to era, I combined all
 In the early days (1871 ~ 1899), **fielding** had the most significant impacts on a team's winnig percentage (about 60.2%), while **hitting**, **pitching** and **baserunning** had marginal influences. However, it appears that such a result has been reversed as time goes on. The importance of **fielding** has declined throughout the history, whereas the importance of **hitting** and **pitching** has increased recently. In the 2000s, **hitting** and **pitching** have the majority part of a team's winning percentage (about 80% together), while **fielding** and **baserunning** don't.
 
 Furthermore, there's one more clear pattern here. **Baserunning** has never been as important as hitting, pitching, and fielding since the start of MLB. In other words, teams have never benefitted that much from successful base running since 1871, so why do they want to focus on base running?
+
+### 8. Linear Regression
+
