@@ -6,7 +6,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn import metrics
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.inspection import permutation_importance
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer
 import statsmodels.api as sm
@@ -387,6 +387,14 @@ for era in eras:
     # plt.xlabel('Importance')
     # plt.show()
 
+    # K-fold cross validation
+    cv_r2 = cross_val_score(model, x, y, scoring='r2', cv=10)
+    cv_mse = cross_val_score(model, x, y, scoring='neg_mean_squared_error', cv=10)
+    cv_rmse = np.sqrt(-1 * mse)
+
+    print('------- 10-Fold Cross Validation ({}) -------'.format(era))
+    print('Mean R-squared: {}'.format(cv_r2.mean()))
+    print('Mean RMSE: {}'.format(cv_rmse).mean())
 
 
 ### 6. Feature Importance Visualization ###
