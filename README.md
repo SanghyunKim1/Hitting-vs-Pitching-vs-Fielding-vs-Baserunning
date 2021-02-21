@@ -122,7 +122,7 @@ According to the histograms and Q-Q plots above, although all the features seem 
 
 ***5-2. Scaling***
 
-<img src="https://github.com/shk204105/Hitting-vs-Pitching-vs-Fielding-vs-Baserunning/blob/master/images/KDE%20Plot.png" width=600 height=600>
+<img src="https://github.com/shk204105/Hitting-vs-Pitching-vs-Fielding-vs-Baserunning/blob/master/images/KDE%20Plot.png" width="600" height="600">
 
 Although scaling is also not needed for random forest models, I scaled features using *StandardScaler* to get some ideas about feature importance by directly comparing features.
 
@@ -154,5 +154,16 @@ See how large the differences in each stat between these two groups are. While t
 
 ### 6. Random Forest Regression
 
+<img src="https://github.com/shk204105/Hitting-vs-Pitching-vs-Fielding-vs-Baserunning/blob/master/images/Random%20Forest.png" width="650" height="400">
+
+The random forest algorithm is an ensemble learning technique that combines predictions from multiple decision trees to make more accurate predictions than an individual decision tree algorithm does. As random forests use a bootstrap aggregation (bagging) method, it runs individual decision trees and aggregates the outputs without any biased preference to any model at the end. For this reason, it resolves the weakness of decision trees, and therefore, it's one of the most frequently used machine learning techniques for both classification and regression tasks.
+
 ![](https://github.com/shk204105/Hitting-vs-Pitching-vs-Fielding-vs-Baserunning/blob/master/images/Estimators.png)
+
+To run a random forest model, I need to decide the number of indibidual trees that can yield the best result. Using the *for loop*, the best number of estimators that yield the highest score in the random forest regression model is turned out to be *190*. With 190 individual decision trees, the random forest regression result is:
+
+| **Measurement** | **Score** | 
+| :-----------: | :-----------: |
+| ***R-squared*** | 0.550845576425548 |
+| ***RMSE*** | 0.06439063966080207 |
 
