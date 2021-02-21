@@ -205,7 +205,7 @@ for col, ax in zip(ind_vars, axes.flatten()[:7]):
     ax.plot(scaled_era_stats[col], marker='', color=palette(num), linewidth=1.8, alpha=.9)
     ax.set_title(col, loc='center', fontsize=12, fontweight=0)
 
-plt.suptitle('Changes in Each Median Stat through Different Eras')
+plt.suptitle('Changes in Each Median Stat throughout Different Eras')
 plt.show()
 
 # compare teams whose 'wPCT' is higher than 0.500 with teams whose 'wPCT' is less than 0.500
