@@ -202,3 +202,7 @@ Furthermore, there's one more clear pattern here. **Baserunning** has never been
 
 ### 8. Linear Regression
 
+### 9. Conclusion
+
+In this project, I analyzed how important each aspect of player skills is in terms of a team's winning percentage. The four main areas are **hitting**, **pitching**, **fielding** and **baserunning**, and these skills are measured by *wOBA*, *FIP*, *Def* and *BsR*, respectively. Of course, single stat for each area wouldn't be enough to perfectly evaluate players' abilities. Nevertheless, as this project aims to understand the impacts of *pure* skills, I decided to include single stats for each aspect to avoid overlapped measurements. Though it doesn't mean that I totally disregarded the predictive power of models. Given the small RMSEs of models in all eras, I believe those models still yield a decent level of predictions (see the RMSE table above).
+
