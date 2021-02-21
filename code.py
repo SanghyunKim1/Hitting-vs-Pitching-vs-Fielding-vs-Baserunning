@@ -329,7 +329,7 @@ for i in sorted_idx:
 
 
 
-### 5. Cross-era Comparison ###
+### 4. Cross-era Comparison ###
 eras = sorted(list(team_df['Era'].unique()))
 importance_dict = {}
 
@@ -395,7 +395,7 @@ for era in eras:
     print('Mean RMSE: {}'.format(cv_rmse.mean()))
 
 
-### 6. Feature Importance Visualization ###
+### 5. Feature Importance Visualization ###
 category_names = ind_vars
 results = dict(sorted(importance_dict.items()))
 
@@ -436,7 +436,7 @@ plt.show()
 
 
 
-### 7. Multiple Linear Regression ###
+### 6. Multiple Linear Regression ###
 def linear_model(era):
     data = scaled_df[scaled_df['Era'] == era]
     x = data.drop(['Season', 'Team', 'wPCT', 'Era', 'wPCT > 0.500'], axis=1)
