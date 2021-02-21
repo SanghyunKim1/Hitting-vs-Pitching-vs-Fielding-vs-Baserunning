@@ -315,7 +315,7 @@ y_predict = model.predict(x_test)
 score = model.score(x_test, y_test)
 mse = metrics.mean_squared_error(y_test, y_predict)
 
-print('------- Random Forest Result -------')
+print('------- Random Forest Regression (1871-2019) -------')
 print('R-squared: {}'.format(score))
 print('RMSE: {}'.format(sqrt(mse)))
 
