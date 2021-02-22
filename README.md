@@ -1,13 +1,13 @@
 # Hitting vs Pitching vs Fielding vs Baserunning
-## Content
+## Table of Contents
 1. Intro
-2. Metadata
-3. Data Cleaning
-4. Feature Selection (Domain Knowledge)
-5. EDA (Exploratory Data Analysis)
-6. Random Forest Regressoin with Feature Importance
-7. Cross-era Comparison
-8. Linear Regression
+2. Technologies
+3. Metadata
+4. Data Cleaning
+5. Feature Selection (Domain Knowledge)
+6. EDA (Exploratory Data Analysis)
+7. Random Forest Regressoin with Feature Importance
+8. Cross-era Comparison
 9. Conclusion
 
 ### 1. Intro
@@ -18,7 +18,18 @@ In this analysis, I focused on what I can predict: **players' pure skills**. The
 
 Players' pure skills can further be broke down into four different aspects: **Hitting**, **Pitching**, **Fielding**, and **Baserunning**. To find the percentage contributions of these factors to a team's winning percentage, I ran a random forest regression model and used an impurity-based feature importance method.
 
-### 2. Metadata
+### 2. Techonologies
+- Python 3.8
+  * Pandas - version 1.2.2
+  * Numpy - version 1.20.1
+  * matplotlib - version 3.3.4
+  * seaborn - version 0.11.1
+  * scikit-learn - version 0.24.1
+  * statsmodels - version 0.12.2
+  * scipy - version 1.6.1
+  * missingno - version 0.4.2
+
+### 3. Metadata
 | **Metadata** | **Information** |
 | :-----------: | :-----------: |
 | **Origin of Data** | [FanGraphs.com](https://www.fangraphs.com) |
@@ -73,7 +84,7 @@ Players' pure skills can further be broke down into four different aspects: **Hi
 | ***RA9-WAR*** | [Runs Allowed based WAR](https://library.fangraphs.com/pitching/fdp/) |
 | ***WAR*** | [Wins Above Replacement for Pitchers](https://library.fangraphs.com/war/calculating-war-pitchers/) |
 
-### 3. Data Cleaning
+### 4. Data Cleaning
 - Renamed data features for clarity.
   * *Batting Dataset*: **R** to **RS**
   * *Batting Dataset*: **WAR** to **bWAR**
@@ -89,7 +100,7 @@ Players' pure skills can further be broke down into four different aspects: **Hi
 - Checked missing data and replaced **xFIP** projected values based on linear regression result (**IterativeImputer**).
 - Dropped unncessary columns.
 
-### 4. Feature Selection (Domain Knowledge)
+### 5. Feature Selection (Domain Knowledge)
 In this analysis, I selected features (*independent variables* to predict team winning percentages) based on domain knowledge.
 As I briefly mentioned above, the purpose of this analysis is to quantify the percentage contribution of player skills (i.e. **Hitting**, **Pitching**, **Fielding** and **Baserunning**). To find statistics that accurately measure players' skills, I focused on *(i) what's the primary job of players in terms of those 4 different aspects*, *(ii)how each stat is calculated*, and *(iii) what these stats measure in the end*. The logic for selected features is the following:
 
@@ -105,8 +116,8 @@ One of the most common problem is that conventional stats have is they treat dif
 - **Baserunning**: Unlike other aspects of player skills, baserunning is an area where there are not many stats available. Some sabermetricians measure a runner's sprint speed (in ft/sec), but such data are unavailable for the past day's teams and inappropriate to use for a team's base running ability. Therefore, I used **BsR** devised by *FanGraphs*. According to *FanGraphs*, **BsR** is an overall base running stat that turns *(i) weighted stolen bases*, *(ii) weighted grounded into double play runs*, and *(iii) Ultimate Base Running (UBR)* into runs above/below average. For more information about BsR, see [here](https://library.fangraphs.com/offense/bsr/).
  
 
-### 5. EDA (Exploratory Data Analysis)
-***5-1. Normality***
+### 6. EDA (Exploratory Data Analysis)
+***6-1. Normality***
 ![](https://github.com/shk204105/Hitting-vs-Pitching-vs-Fielding-vs-Baserunning/blob/master/images/wPCT%20Histogram:Q-Q%20Plot.png)
 
 <table>
@@ -119,13 +130,13 @@ One of the most common problem is that conventional stats have is they treat dif
 According to the histograms and Q-Q plots above, although all the features seem to follow approximate noraml distributions, **wOBA** and **BsR** are slighty skewed. However, as I'm going to use a random forest regression model, normalizing data is unnecessary.
 
 
-***5-2. Scaling***
+***6-2. Scaling***
 
 <img src="https://github.com/shk204105/Hitting-vs-Pitching-vs-Fielding-vs-Baserunning/blob/master/images/KDE%20Plot.png" width="600" height="600">
 
 Although scaling is also not needed for random forest models, I scaled features using *StandardScaler* to get some ideas about feature importance by directly comparing features.
 
-***5-3. Historical Changes in Each Stat***
+***6-3. Historical Changes in Each Stat***
 
 Since 1871, many external factors (e.g. changes in rules and resilience of the ball, league expansion, or advances in skills) have been affecting the way games are played (i.e. how teams win the ball game). Therefore, it's reasonable to think that such external factors must have affected league average stats throughout the MLB history. Further, looking at those historical changes in each stat would also give us some general ideas about what was the most important factors in different eras. To see those changes I created two time series plots.
 
@@ -141,7 +152,7 @@ Another pattern we can see from this plot is that when league wOBA was relativel
 
 I also created year bins to see a general trend for those stats, and the result seems similar to what I've concluded above.
 
-***5-4. Winning Team vs Losing Team***
+***6-4. Winning Team vs Losing Team***
 
 ![](https://github.com/shk204105/Hitting-vs-Pitching-vs-Fielding-vs-Baserunning/blob/master/images/Bar%20Plot.png)
 
@@ -151,11 +162,11 @@ The bar plot above where each bar represents the median scales of stats depicts 
 
 See how large the differences in each stat between these two groups are. While the differences in *wOBA* and *Def* are relatively larger, the difference in *FIP* is not as significant as *wOBA* and *Def*. Moreoever, the difference in *BsR* between these two groups are marginal compared to other three stats. Thus, **hitting** and **fielding** might have more significant impacts on a team's winning percentage than **pitching**, while **baserunning** is not that important. Let's see if that's the case.
 
-### 6. Random Forest Regression with Feature Importance
+### 7. Random Forest Regression with Feature Importance
 
 <img src="https://github.com/shk204105/Hitting-vs-Pitching-vs-Fielding-vs-Baserunning/blob/master/images/Random%20Forest.png" width="650" height="400">
 
-***6-1. Random Forest Regression***
+***7-1. Random Forest Regression***
 
 The random forest algorithm is an ensemble learning technique that combines predictions from multiple decision trees to make more accurate predictions than an individual decision tree algorithm does. As random forests use a bootstrap aggregation (bagging) method, it runs individual decision trees and aggregates the outputs without any biased preference to any model at the end. For this reason, it resolves the weakness of decision trees, and therefore, it's one of the most frequently used machine learning techniques for both classification and regression tasks.
 
@@ -170,7 +181,7 @@ To run a random forest model, I need to decide the number of indibidual trees th
 
 Though the R-squared of 0.55 is not that impressive, the R-squared in this project isn't as important as it is for prediction tasks  because the goal of this project is to find relationships between variables. The RMSE of 0.064 conveys that the average difference between predictive winnig percentages and observed winning percentages is about 0.064. A winning percentage of 0.064 is equivalent to 10.3 games in modern baseball (162 games * 0.064). Thus, the difference of ± 5 games would give us reasonable predictions given the number of total games for one season (162 games in total).
 
-***6-2. Random Forest Feature Importance***
+***7-2. Random Forest Feature Importance***
 
 | **Feature** | **Feature Importance** | 
 | :-----------: | :-----------: |
@@ -181,7 +192,7 @@ Though the R-squared of 0.55 is not that impressive, the R-squared in this proje
 
 Throughout the MLB history (1871 ~ 2019), it appears that **hitting** has the most significant impact on a team's winning percentage (about 33.5%), **pitching**  (about 29.8%), **fielding** (about 25.5%) have the second most impacts, and **baserunning** (about 11.1%) is the least important. The result seems somewhat similar to what I've concluded in *EDA*. Nevertheless, as I mentioned above, there have been various external factors that affected the ball game throughout the MLB history. Therefore, I also ran random forest regression models to see how feature importance varied from era to era.
 
-### 7. Cross-era comparison
+### 8. Cross-era comparison
 
 With the same data, the result of random forest models in each era is:
 
@@ -200,13 +211,11 @@ In the early days (1871 ~ 1899), **fielding** had the most significant impacts o
 
 Furthermore, there's one more clear pattern here. **Baserunning** has never been as important as hitting, pitching, and fielding since the start of MLB. In other words, teams have never benefitted that much from successful base running since 1871, so why do they want to focus on base running?
 
-### 8. Linear Regression
-
 ### 9. Conclusion
 
 In this project, I analyzed how important each aspect of player skills is in terms of a team's winning percentage. The four main areas are **hitting**, **pitching**, **fielding** and **baserunning**, and these skills are measured by *wOBA*, *FIP*, *Def* and *BsR*, respectively. Of course, single stat wouldn't be enough to perfectly evaluate each areas of player abilities. Nevertheless, as this project aims to understand the impacts of *pure* skills, I decided to include single stats for each aspect to avoid overestimation problems, and therefore, the models above could yeild relatively small R-squared values. Though it doesn't mean that I totally disregarded the predictive power of models. Given the small RMSEs of models in all eras, I believe those models still yield a decent level of predictions (see the RMSE table above).
 
-From EDA and random forest feature importance (*impurity-based method*) analysis, I came to a conclusion that **fielding** used to be the most significant factor for teams in the early days, but such a trend seems to have changed over time. Since the 1900s, **hitting** and **pitching** started to account for large proportions of team winning percentages while **fielding** is getting less important than it used to be. On the other hand, **baserunning** has never influenced a team's winning percentage that much. So it appears that teams would benefit from strengthening their hitting and pitching capacities.
+Through EDA and random forest feature importance (*impurity-based method*) analysis, I came to a conclusion that **fielding** used to be the most significant factor for teams in the early days, but such a trend seems to have changed over time. Since the 1900s, **hitting** and **pitching** started to account for large proportions of team winning percentages, while **fielding** is getting less important than it used to be. On the other hand, **baserunning** has never influenced a team's winning percentage that much. So it appears that teams would benefit from strengthening their hitting and pitching capacities.
 
 Nonetheless, this analysis also has several drawbacks. First, the impurity-based method for measuring feature importance tend to overestimate numerical features. Thus, the percentage contributions of each stat might have been overestimated. Second, since I didn't use post-season data, the result may be inappropriate to conclude how much importance those stats have for post-season results. Therefore, further analysis would be required to see what makes the World Series champions, which is the ultimate goal of all MLB teams.
 
