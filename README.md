@@ -144,7 +144,7 @@ Since 1871, many external factors (e.g. changes in rules and resilience of the b
 
 ![](https://github.com/shk204105/Hitting-vs-Pitching-vs-Fielding-vs-Baserunning/blob/master/images/Time%20Series%20Plot1.png)
 
-According to the line plot above, while *Def* and *BsR* seem to stay constant, *wOBA* and *FIP* that represent **Hitting** and **Pitching**, respectively are relatively more fluctuating depending on eras. What does it indicate? Well, it could show that *the importance of **hitting** and **pitching** ability has been larger than **fielding** and **baserunning***.
+According to the line plot above, while *Def* and *BsR* have been staying constant, *wOBA* and *FIP* that represent **Hitting** and **Pitching**, respectively are relatively more fluctuating depending on eras. What does it indicate? Well, it could show that *the importance of **hitting** and **pitching** ability has been larger than **fielding** and **baserunning***.
 
 Another pattern we can see from this plot is that when league wOBA was relatively high (i.e. hitter-friendly eras), league FIP also got higher (i.e. pitchers must have struggled with doing their jobs during the same eras) on average, and *vice versa*. (Note: the lower FIP is the better pitchers do their jobs.)
 
