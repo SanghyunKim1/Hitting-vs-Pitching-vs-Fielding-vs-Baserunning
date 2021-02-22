@@ -32,7 +32,7 @@ Players' pure skills can further be broke down into four different aspects: **Hi
 ### 3. Metadata
 | **Metadata** | **Information** |
 | :-----------: | :-----------: |
-| **Origin of Data** | [FanGraphs.com](https://www.fangraphs.com) |
+| **Origin of Data** | [FanGraphs](https://www.fangraphs.com) |
 | **Terms of Use** | [Terms and Conditions](https://www.fangraphs.com/about/terms-of-service) |
 | **Data Structure** | a team batting dataset consisting of 2926 rows * 20 columns |
 | **Data Structure** | a team pitching dataset consisting of 2926 rows * 21 columns |
