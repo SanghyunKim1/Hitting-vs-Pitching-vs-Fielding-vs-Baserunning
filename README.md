@@ -95,7 +95,7 @@ Players' pure skills can further be broke down into four different aspects: **Hi
 - Combined team batting and team pitching dataset.
 - Created new data features.
   * **UER**: *Unearned Runs* = **RA** - **ER**
-  * **G**: *# Games Played* = **W** + **L**
+  * **G**: *Number of Games Played* = **W** + **L**
   * **wPCT**: *Team Winning Percentage* = (**W** + **L**)/**G**
 - Checked missing data and replaced **xFIP** projected values based on linear regression result (**IterativeImputer**).
 - Dropped unncessary columns.
