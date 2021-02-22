@@ -73,7 +73,7 @@ Players' pure skills can further be broke down into four different aspects: **Hi
 | ***H/9*** | [Hits per 9 Innings](http://m.mlb.com/glossary/advanced-stats/hits-per-nine-innings) |
 | ***K/9*** | [Strikeouts per 9 Innings](https://library.fangraphs.com/pitching/rate-stats/) |
 | ***BB/9*** | [Walks per 9 Innings](https://library.fangraphs.com/pitching/rate-stats/) |
-| ***HR/9*** | [Homeruns per 9 Innings](http://m.mlb.com/glossary/advanced-stats/home-runs-per-nine-innings) |
+| ***HR/9*** | [Home runs per 9 Innings](http://m.mlb.com/glossary/advanced-stats/home-runs-per-nine-innings) |
 | ***WHIP*** | [Walks plus Hits per Innings Pitched](https://library.fangraphs.com/pitching/whip/) |
 | ***BABIP*** | [Batting Average on Balls in Play](https://library.fangraphs.com/pitching/babip/) |
 | ***EV*** | [Exit Velocity](http://m.mlb.com/glossary/statcast/exit-velocity) |
