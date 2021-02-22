@@ -18,7 +18,7 @@ In this analysis, I focused on what I can predict: **players' pure skills**. The
 
 Players' pure skills can further be broke down into four different aspects: **Hitting**, **Pitching**, **Fielding**, and **Baserunning**. To find the percentage contributions of these factors to a team's winning percentage, I ran a random forest regression model and used an impurity-based feature importance method.
 
-### 2. Techonologies
+### 2. Technologies
 - Python 3.8
   * Pandas - version 1.2.2
   * Numpy - version 1.20.1
