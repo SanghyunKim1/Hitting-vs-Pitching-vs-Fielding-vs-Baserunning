@@ -138,7 +138,7 @@ Although scaling is also not needed for random forest models, I scaled features 
 
 ***6-3. Historical Changes in Each Stat***
 
-Since 1871, many external factors (e.g. changes in rules and resilience of the ball, league expansion, or advances in skills) have been affecting the way games are played (i.e. how teams win the ball game). Therefore, it's reasonable to think that such external factors must have affected league average stats throughout the MLB history. Further, looking at those historical changes in each stat would also give us some general ideas about what was the most important factors in different eras. To see those changes I created two time series plots.
+Since 1871, many external factors (e.g. changes in rules and resilience of the ball, league expansion, or advances in physical abilities) have been affecting the way games are played (i.e. how teams win the ball game). Therefore, it's reasonable to think that such external factors must have affected league average stats throughout the MLB history. Further, looking at those historical changes in each stat would also give us some general ideas about what was the most important factors in different eras. To see those changes I created two time series plots.
 
 *Note: I used median values of each stat instead of mean values to avoid outlier issues. Also, I used scaled data to directly compare different stats.
 
