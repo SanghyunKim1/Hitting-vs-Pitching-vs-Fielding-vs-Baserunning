@@ -150,7 +150,7 @@ Another pattern we can see from this plot is that when league wOBA was relativel
 
 ![](https://github.com/shk204105/Hitting-vs-Pitching-vs-Fielding-vs-Baserunning/blob/master/images/Time%20Series%20Plot2.png)
 
-I also created year bins to see a general trend for those stats, and the result seems similar to what I've concluded above.
+Furthermore, I also created year bins to see a general trend for those stats, and the result seems similar to what I've concluded above.
 
 ***6-4. Winning Team vs Losing Team***
 
