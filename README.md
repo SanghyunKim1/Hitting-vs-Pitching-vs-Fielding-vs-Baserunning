@@ -138,7 +138,7 @@ Although scaling is also not needed for random forest models, I scaled features 
 
 ***6-3. Historical Changes in Each Stat***
 
-Since 1871, many external factors (e.g. changes in rules and resilience of the ball, league expansion, or advances in physical abilities) have been affecting the way games are played (i.e. how teams win the ball game). Therefore, it's reasonable to think that such external factors must have affected league average stats throughout the MLB history. Further, looking at those historical changes in each stat would also give us some general ideas about what was the most important factors in different eras. To see those changes I created two time series plots.
+Since 1871, many external factors (e.g. changes in rules and resilience of the ball, league expansion, or advances in physical abilities) have been affecting the way games are played (i.e. how teams win the ball game). Therefore, it's reasonable to think that such external factors must have affected league average stats throughout the MLB history. Further, looking at historical changes in each stat would also give us some general ideas about what was the most important factors in different eras. To see those changes I created two time series plots.
 
 *Note: I used median values of each stat instead of mean values to avoid outlier issues. Also, I used scaled data to directly compare different stats.
 
@@ -146,7 +146,7 @@ Since 1871, many external factors (e.g. changes in rules and resilience of the b
 
 According to the line plot above, while *Def* and *BsR* have been staying constant, *wOBA* and *FIP* that represent **Hitting** and **Pitching**, respectively are relatively more fluctuating depending on eras. What does it indicate? Well, it could show that *the importance of **hitting** and **pitching** ability has been larger than **fielding** and **baserunning***.
 
-Another pattern we can see from this plot is that when league wOBA was relatively high (i.e. hitter-friendly eras), league FIP also got higher (i.e. pitchers must have struggled with doing their jobs during the same eras) on average, and *vice versa*. (Note: the lower FIP is the better pitchers do their jobs.)
+Another pattern we can see from this plot is that when league wOBA was relatively high (i.e. hitter-friendly eras), league FIP also got higher indicating that pitchers struggled with doing their jobs during the same eras on average, and *vice versa*. (Note: the lower FIP is the better pitchers do their jobs.)
 
 ![](https://github.com/shk204105/Hitting-vs-Pitching-vs-Fielding-vs-Baserunning/blob/master/images/Time%20Series%20Plot2.png)
 
