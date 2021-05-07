@@ -172,7 +172,7 @@ The random forest algorithm is an ensemble learning technique that combines pred
 
 ![](https://github.com/shk204105/Hitting-vs-Pitching-vs-Fielding-vs-Baserunning/blob/master/images/Estimators.png)
 
-To run a random forest model, I need to decide the number of indibidual trees that can yield the best result. Using the *for loop*, the best number of estimators that yield the highest score in the random forest regression model is turned out to be *190*. With 190 individual decision trees, the random forest regression result is:
+To run a random forest model, I need to decide the number of individual trees that can yield the best result. Using the *for loop*, the best number of estimators that yield the highest score in the random forest regression model is turned out to be *190*. With 190 individual decision trees, the random forest regression result is:
 
 | **Measurement** | **Score** | 
 | :-----------: | :-----------: |
