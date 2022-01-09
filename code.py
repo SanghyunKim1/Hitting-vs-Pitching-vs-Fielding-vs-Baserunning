@@ -80,7 +80,7 @@ print(team_df.isnull().sum())
 # number of duplicates
 print('Number of Duplicates: {}'.format(team_df.duplicated().sum()))
 
-# note: based on domain knowledge, I filtered the best features for this analysis
+# note: based on domain knowledge, I filtered the best features before the analysis
 # for more information about how and why I selected features below,
 # please refer to https://github.com/shk204105/Hitting-vs-Pitching-vs-Fielding-vs-Baserunning
 
@@ -125,7 +125,7 @@ for col, ax in zip(ind_vars, axes.flatten()[:7]):
 
 plt.show()
 
-# descriptive summaries
+# descriptive summary
 print(team_df.describe().to_string())
 # as all the independent variables have different ranges, scale them
 
@@ -152,7 +152,7 @@ for col in cols:
 plt.show()
 
 # Changes in median values of each stat throughout the MLB history
-# note: scaled data is used for this analysis to accurately compare all the different stats
+# note: scaled data is used for this analysis to accurately compare different four metrics
 season_df = scaled_df.groupby('Season')[ind_vars].median()
 
 fig, axes = plt.subplots(2, 2, figsize=(18, 7))
@@ -399,7 +399,6 @@ category_names = ind_vars
 results = dict(sorted(importance_dict.items()))
 
 def importance_score(results, category_names):
-
     labels = list(results.keys())
     data = np.array(list(results.values()))
     data_cum = data.cumsum(axis=1)
